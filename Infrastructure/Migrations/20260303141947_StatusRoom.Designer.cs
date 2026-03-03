@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260303090210_ForeignKeyexpenseFix")]
-    partial class ForeignKeyexpenseFix
+    [Migration("20260303141947_StatusRoom")]
+    partial class StatusRoom
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,14 +42,9 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("TaskItemId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
-
-                    b.HasIndex("TaskItemId");
 
                     b.ToTable("Expenses");
                 });
@@ -87,6 +82,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -150,10 +148,6 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.TaskItem", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("TaskItemId");
-
                     b.Navigation("Project");
                 });
 
@@ -204,8 +198,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.TaskItem", b =>
                 {
-                    b.Navigation("Expenses");
-
                     b.Navigation("Subtasks");
                 });
 #pragma warning restore 612, 618

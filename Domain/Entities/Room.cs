@@ -1,11 +1,13 @@
 ﻿using System.Text.Json.Serialization;
-
+using Domain.Enums;
 namespace Domain.Entities;
 
 public class Room 
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+
+    public RoomStatus Status { get; set; }
 
     public Guid ProjectId { get; set; }
 
@@ -16,10 +18,11 @@ public class Room
 
     public Room() { }
 
-    public Room(string name)
+    public Room(string name, RoomStatus status)
     {
         Id = Guid.NewGuid();
         Name = name;
+        Status = status;
     }
 
 }

@@ -28,7 +28,10 @@ namespace Reno.Controllers
         [HttpGet("{projectId}")]
         public async Task<ActionResult<Project>> GetProject(Guid projectId)
         {
-            var project = await _db.RenovationProjects.FindAsync(projectId);
+            var project = await _db.RenovationProjects
+                .Include(p => p.Rooms)
+                .Include(p=> p.Expenses)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
             if (project == null) return NotFound("Project niet gevonden.");
             return Ok(project);
         }

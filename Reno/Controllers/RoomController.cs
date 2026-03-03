@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reno.DTO;
+using Domain.Enums;
 
 
 
@@ -47,6 +48,7 @@ namespace Reno.Controllers
             var newRoom = new Room
             {
                 Name = dto.Name,
+                Status = Enum.Parse<RoomStatus>(dto.Status),
                 ProjectId = project.Id
             };
 

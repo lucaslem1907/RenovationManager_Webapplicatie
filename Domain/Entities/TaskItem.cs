@@ -20,10 +20,12 @@ public class TaskItem
 
     public TaskItem() { }
 
-    public TaskItem(string title, string description = "")
+    public TaskItem(string title, string description, Guid roomId)
     {
         Id = Guid.NewGuid();
         Title = title;
         Description = description;
+        RoomId = roomId;
+
     }
 }

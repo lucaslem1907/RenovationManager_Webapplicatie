@@ -5,25 +5,25 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ExpandDbExpense : Migration
+    public partial class StatusRoom : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Name",
-                table: "Expenses",
-                type: "nvarchar(max)",
+            migrationBuilder.AddColumn<int>(
+                name: "Status",
+                table: "Rooms",
+                type: "int",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Name",
-                table: "Expenses");
+                name: "Status",
+                table: "Rooms");
         }
     }
 }
