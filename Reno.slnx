@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Domain/Domain.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" Id="b78e0185-93b4-45bb-b146-a2f96844d88b" />
+  <Project Path="Reno/Reno.csproj" />
+</Solution>
