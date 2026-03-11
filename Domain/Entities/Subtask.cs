@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using System.Net;
+
+namespace Domain.Entities;
 
 public class Subtask
 {
@@ -12,16 +14,22 @@ public class Subtask
 
     private Subtask() { } // EF Core
 
-    internal Subtask(string title, Guid taskItemId)
+    public Subtask(string title, Guid taskItemId, bool status)
     {
         Id = Guid.NewGuid();
         Title = title;
         TaskItemId = taskItemId;
-        IsCompleted = false;
+        IsCompleted = status;
     }
 
     public void MarkAsCompleted()
     {
         IsCompleted = true;
+    }
+
+    public void UpdateSubtask(string title, bool status)
+    {
+        Title = title;
+        IsCompleted = status;
     }
 }
