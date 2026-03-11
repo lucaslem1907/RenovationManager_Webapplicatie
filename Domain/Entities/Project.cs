@@ -8,7 +8,14 @@ public class Project
     public string Name { get; private set; }
     public string? Description { get; private set; }
 
+    public string? Address { get; private set; }
+
+    public decimal? Budget { get; private set; }
+
+    public DateTime StartDate { get; private set; } = DateTime.UtcNow;
+
     public Guid OwnerId { get; private set; }
+    public User Owner { get; private set; }
 
     public ICollection<Room> Rooms { get; private set; } = new List<Room>();
 
@@ -16,12 +23,21 @@ public class Project
 
     private Project() { }
 
-    public Project(string name, Guid ownerId, string description = "")
+    public Project(string name, User ownerId, string description = "")
     {
         Id = Guid.NewGuid();
         Name = name;
-        OwnerId = ownerId;
+        Owner = ownerId;
         Description = description;
+    }
+
+    public void UpdateProject(string name, string description, string address, decimal? budget, DateTime startDate)
+    {
+        Name = name;
+        Description = description;
+        Address = address;
+        Budget = budget;
+        StartDate = startDate;
     }
 
 }

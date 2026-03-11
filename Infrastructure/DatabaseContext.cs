@@ -6,7 +6,7 @@ namespace Infrastructure
     public class DatabaseContext : DbContext
     {
 
-
+        public DbSet<User> Users => Set<User>();
         public DbSet<Project> RenovationProjects => Set<Project>();
         public DbSet<Room> Rooms => Set<Room>();
 
@@ -24,23 +24,51 @@ namespace Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Project>()
-                .HasMany(p => p.Rooms)
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+
+                entity.HasMany(u => u.Projects)
+                .WithOne(p => p.Owner)
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            });
+
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.Property(p => p.Budget)
+                      .HasPrecision(18, 2);
+
+                entity.HasMany(p => p.Rooms)
                 .WithOne(r => r.Project)
                 .HasForeignKey(r => r.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+            });
+                
 
-            modelBuilder.Entity<Room>()
-                .HasMany(r => r.Tasks)
+            modelBuilder.Entity<Room>(entity =>
+            {
+
+                entity.HasMany(r => r.Tasks)
                 .WithOne(t => t.Room)
                 .HasForeignKey(t => t.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
+            });
+                
 
-            modelBuilder.Entity<TaskItem>()
-                .HasMany(t => t.Subtasks)
+            modelBuilder.Entity<TaskItem>(entity =>
+            {
+
+                entity.HasMany(t => t.Subtasks)
                 .WithOne(s => s.TaskItem)
                 .HasForeignKey(s => s.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            }
+            );
+
 
             modelBuilder.Entity<Subtask>()
                 .HasOne(s => s.TaskItem)
@@ -59,6 +87,10 @@ namespace Infrastructure
                 .HasForeignKey(e => e.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+                entity.HasOne(e => e.Room)
+                .WithMany(r => r.Expenses)
+                .HasForeignKey(e => e.RoomId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             }
 

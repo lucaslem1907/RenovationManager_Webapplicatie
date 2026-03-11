@@ -8,14 +8,14 @@ public class TaskItem
     public string Title { get; private set; }
     public string Description { get; private set; }
 
-    public Guid RoomId { get; set; }
+    public bool IsCompleted { get; set; }
 
-    [JsonIgnore]
+    public Guid RoomId { get; set; }
+        [JsonIgnore]
     public Room Room { get;  set; } = null!;
 
 
     private readonly List<Subtask> _subtasks = new();
-
     public ICollection<Subtask> Subtasks => _subtasks;
 
     public TaskItem() { }
@@ -27,5 +27,12 @@ public class TaskItem
         Description = description;
         RoomId = roomId;
 
+    }
+
+    public void UpdateTask(string title, string description, bool isCompleted)
+    {
+        Title = title;
+        Description = description;
+        IsCompleted = isCompleted;
     }
 }

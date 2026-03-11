@@ -30,6 +30,7 @@ namespace Reno.Controllers
         {
             var project = await _db.RenovationProjects
                 .Include(p => p.Rooms)
+                .ThenInclude(r => r.Tasks)
                 .Include(p=> p.Expenses)
                 .FirstOrDefaultAsync(p => p.Id == projectId);
             if (project == null) return NotFound("Project niet gevonden.");
@@ -40,7 +41,10 @@ namespace Reno.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Project>> CreateProject([FromBody] ProjectDto dto)
         {
-            var project = new Project(dto.Name, dto.OwnerId);
+            var owner = await _db.Users.FindAsync(dto.OwnerId);
+            if (owner == null) return NotFound("Owner niet gevonden.");
+
+            var project = new Project(dto.Name, owner, dto.Description);
             await _db.AddAsync(project);
             await _db.SaveChangesAsync();
             return Ok(project);
@@ -48,6 +52,16 @@ namespace Reno.Controllers
         }
 
 
+        [HttpPut("{projectId}")]
+
+        public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
+        {
+            var project = await _db.RenovationProjects.FindAsync(projectId);
+            if (project == null) return NotFound("Project niet gevonden.");
+            project.UpdateProject(dto.Name, dto.Description, dto.Address, dto.Budget, dto.StartDate);
+            await _db.SaveChangesAsync();
+            return Ok(project);
+        }
 
 
         [HttpDelete("{projectId}")]

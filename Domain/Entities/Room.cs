@@ -7,7 +7,7 @@ public class Room
     public Guid Id { get; set; }
     public string Name { get; set; }
 
-    public RoomStatus Status { get; set; }
+    public RoomStatus Status { get; set; } 
 
     public Guid ProjectId { get; set; }
 
@@ -15,6 +15,8 @@ public class Room
     public Project Project { get; set; } = null!;
 
     public ICollection<TaskItem> Tasks { get; private set; } = new List<TaskItem>();
+
+    public ICollection<Expense> Expenses { get; private set; } = new List<Expense>();
 
     public Room() { }
 
