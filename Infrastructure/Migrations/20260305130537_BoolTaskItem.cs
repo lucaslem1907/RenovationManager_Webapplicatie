@@ -5,25 +5,25 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class StatusRoom : Migration
+    public partial class BoolTaskItem : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Status",
-                table: "Rooms",
-                type: "int",
+            migrationBuilder.AddColumn<bool>(
+                name: "IsCompleted",
+                table: "Tasks",
+                type: "bit",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: false);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Status",
-                table: "Rooms");
+                name: "IsCompleted",
+                table: "Tasks");
         }
     }
 }

@@ -1,16 +1,18 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reno.DTO;
-using Domain.Enums;
 
 
 
 namespace Reno.Controllers
 
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RoomController : ControllerBase
@@ -34,7 +36,10 @@ namespace Reno.Controllers
         [HttpGet("{projectId}/rooms")]
         public async Task<ActionResult<IEnumerable<Room>>> GetProjectRooms(Guid projectId)
         {
-            var project = await _db.RenovationProjects.Include(p => p.Rooms).FirstOrDefaultAsync(p => p.Id == projectId);
+            var project = await _db.RenovationProjects.
+                Include(p => p.Rooms)
+                .ThenInclude(p=> p.Tasks)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
             if (project == null) return NotFound("Project niet gevonden.");
             return Ok(project.Rooms);
         }
@@ -65,11 +70,25 @@ namespace Reno.Controllers
         }
 
 
-        [HttpDelete("{projectId}/{roomId}")]
-        public async Task<ActionResult> DeleteRoom(Guid projectId, Guid roomId)
+        [HttpDelete("{roomId}")]
+        public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses = false)
         {
-            var room = await _db.Rooms.FindAsync(roomId);
-            if (room == null) return NotFound("Project niet gevonden.");
+            var room = await _db.Rooms.Include(r => r.Expenses).FirstOrDefaultAsync(r => r.Id == roomId);
+            if (room == null) return NotFound("Room not found.");
+
+            if (deleteExpenses)
+            {
+                // delete all expenses for this room
+                _db.Expenses.RemoveRange(room.Expenses);
+            }
+            else
+            {
+                // set roomId to null on expenses
+                foreach (var expense in room.Expenses)
+                {
+                    expense.RoomId = null;
+                }
+            }
 
             _db.Rooms.Remove(room);
             await _db.SaveChangesAsync();

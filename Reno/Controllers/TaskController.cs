@@ -1,12 +1,13 @@
 ﻿using Domain.Entities;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reno.DTO;
 
 namespace Reno.Controllers
 {
-
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class TaskController : ControllerBase
@@ -51,6 +52,16 @@ namespace Reno.Controllers
                 Id = newTask.Id,
                 Name = newTask.Title
             });
+        }
+
+        [HttpPut("{roomId}/tasks/{taskId}")]
+         public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)
+        {
+            var task = await _db.Tasks.FindAsync(taskId);
+            if (task == null) return NotFound("Task niet gevonden.");
+            task.UpdateTask(dto.Title, dto.Description, dto.IsCompleted);
+            await _db.SaveChangesAsync();
+            return NoContent(); 
         }
 
 

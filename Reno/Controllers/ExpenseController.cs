@@ -1,11 +1,13 @@
 ﻿using Domain.Entities;
 using Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Reno.DTO;
 
 namespace Reno.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[Controller]")]
 
@@ -31,9 +33,11 @@ namespace Reno.Controllers
         [HttpGet("{projectId}")]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
         {
+            var expenses = await _db.Expenses
+                .Where(e => e.ProjectId == projectId)
+                .ToListAsync();
 
-            var expenses = await _db.RenovationProjects.FindAsync(projectId);
-            if (expenses == null) { return NotFound(); }
+            if (!expenses.Any()) return NotFound();
 
             return Ok(expenses);
         }
@@ -44,7 +48,7 @@ namespace Reno.Controllers
             var project = await _db.RenovationProjects.FindAsync(projectId);
             if (project == null) { return NotFound(); }
 
-            var newExpense = new Expense(dto.Amount, dto.Name, projectId);
+            var newExpense = new Expense(dto.Amount, dto.Name, projectId, dto.RoomId, dto.Description, dto.Status);
             _db.Expenses.Add(newExpense);
             await _db.SaveChangesAsync();
 
@@ -55,6 +59,19 @@ namespace Reno.Controllers
                 Amount = newExpense.Amount
             });
 
+        }
+
+        [HttpPut("{expenseId}/update")]
+        public async Task<ActionResult> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
+        {
+            var expense = await _db.Expenses.FindAsync(expenseId);
+            if (expense == null) { return NotFound(); }
+            expense.Name = dto.Name;
+            expense.Description = dto.Description;
+            expense.Amount = dto.Amount;
+            expense.Status = dto.Status;
+            await _db.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
