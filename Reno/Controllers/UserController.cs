@@ -20,17 +20,7 @@ namespace Reno.Controllers
         {
             db = context;
         }
-        /*
-        [HttpPost("Create")]
-        public async Task<ActionResult<User>> CreateUser([FromBody] UserRegisterDto dto)
-        {
 
-            var user = new User(dto.FirstName, dto.LastName, dto.Email, password);
-            await db.Users.AddAsync(user);
-            await db.SaveChangesAsync();
-            return Ok(user);
-        }
-        */
         [HttpGet("CurrentUser")]
         public async Task<ActionResult<User>> GetUser()
         {
