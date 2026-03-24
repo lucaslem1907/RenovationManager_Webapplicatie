@@ -1,9 +1,8 @@
-﻿using Domain.Entities;
-using Infrastructure;
+﻿using Application.Expenses;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Reno.DTO;
+using Shared.DTO;
 
 namespace Reno.Controllers
 {
@@ -13,18 +12,46 @@ namespace Reno.Controllers
 
     public class ExpenseController : ControllerBase
     {
-        public DatabaseContext _db;
+        private readonly CreateExpenseUseCase _createExpense;
+        private readonly GetExpenseUseCase _getExpense;
+        private readonly UpdateExpenseUseCase _updateExpense;
+        private readonly DeleteExpenseUseCase _deleteExpense;
 
-        public ExpenseController(DatabaseContext db)
+        public ExpenseController(
+            CreateExpenseUseCase createExpense, 
+            GetExpenseUseCase getExpense, 
+            UpdateExpenseUseCase updateExpense,
+            DeleteExpenseUseCase deleteExpense)
         {
-            _db = db;
+            _createExpense = createExpense; 
+            _getExpense = getExpense;
+            _updateExpense = updateExpense;
+            _deleteExpense = deleteExpense;
         }
 
+        [HttpPost("{projectId}/create")]
+        public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
+        {
+            var expense = await _createExpense.Execute(projectId, dto);
+            if (expense == null) { return BadRequest("Expense niet kunnen maken"); }
+
+            return CreatedAtAction(nameof(CreateExpense),
+                new
+                {
+                    projectId = expense.Id,
+                    Name = expense.Name,
+                    Amount = expense.Amount,
+                    RoomId = expense.RoomId
+
+                });
+
+        }
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
         {
 
-            var expenses = await _db.Expenses.ToListAsync();
+            var expenses = await _getExpense.GetAllExpenses();
             if (expenses == null) { return NotFound(); }
 
             return Ok(expenses);
@@ -33,44 +60,27 @@ namespace Reno.Controllers
         [HttpGet("{projectId}")]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
         {
-            var expenses = await _db.Expenses
-                .Where(e => e.ProjectId == projectId)
-                .ToListAsync();
-
-            if (!expenses.Any()) return NotFound();
+            var expenses = await _getExpense.GetExpensesByProjectId(projectId);
+            if (expenses == null) { return NotFound(); }
 
             return Ok(expenses);
         }
 
-        [HttpPost("{projectId}/create")]
-        public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
-        {
-            var project = await _db.RenovationProjects.FindAsync(projectId);
-            if (project == null) { return NotFound(); }
 
-            var newExpense = new Expense(dto.Amount, dto.Name, projectId, dto.RoomId, dto.Description, dto.Status);
-            _db.Expenses.Add(newExpense);
-            await _db.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(CreateExpense), new { projectId = project.Id }, new
-            {
-                Id = newExpense.Id,
-                Name = newExpense.Name,
-                Amount = newExpense.Amount
-            });
-
-        }
 
         [HttpPut("{expenseId}/update")]
         public async Task<ActionResult> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
         {
-            var expense = await _db.Expenses.FindAsync(expenseId);
+            var expense = await _updateExpense.Execute(expenseId, dto);
             if (expense == null) { return NotFound(); }
-            expense.Name = dto.Name;
-            expense.Description = dto.Description;
-            expense.Amount = dto.Amount;
-            expense.Status = dto.Status;
-            await _db.SaveChangesAsync();
+            return Ok(expense);
+        }
+
+        [HttpDelete("{expenseId}/delete")]
+        public async Task<ActionResult> DeleteExpense(Guid expenseId)
+        {
+            var success = await _deleteExpense.Execute(expenseId);
+            if (!success) return NotFound("Expense niet kunnen verwijderen.");
             return NoContent();
         }
     }

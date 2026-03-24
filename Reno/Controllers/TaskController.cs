@@ -1,9 +1,9 @@
-﻿using Domain.Entities;
-using Infrastructure;
+﻿using Application.Tasks;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reno.DTO;
+using Shared.DTO;
 
 namespace Reno.Controllers
 {
@@ -13,67 +13,70 @@ namespace Reno.Controllers
     public class TaskController : ControllerBase
     {
 
-        public DatabaseContext _db;
+        private readonly GetTaskUseCase _getTask;
+        private readonly UpdateTaskUseCase _updateTask;
+        private readonly CreateTaskUseCase _createTask;
+        private readonly DeleteTaskUseCase _deleteTask;
 
-        public TaskController(DatabaseContext db)
+        public TaskController(GetTaskUseCase getTask, 
+            UpdateTaskUseCase updateTask, 
+            CreateTaskUseCase createTask, 
+            DeleteTaskUseCase deleteTask)
         {
-            _db = db;
+            _createTask = createTask;
+            _deleteTask = deleteTask;
+            _updateTask = updateTask;
+            _getTask = getTask;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
-            var tasks = await _db.Tasks.ToListAsync();
-            if (tasks == null || tasks.Count == 0) { return NotFound(); }
+            var tasks = await _getTask.GetAllTasks();
+            if (tasks == null) { return NotFound(); }
             return Ok(tasks);
         }
 
         [HttpGet("{roomId}/tasks")]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetRoomTasks(Guid roomId)
         {
-            var room = await _db.Rooms.Include(r => r.Tasks).FirstOrDefaultAsync(r => r.Id == roomId);
-            if (room == null) return NotFound("Room niet gevonden.");
-            return Ok(room.Tasks);
+            var tasks = await _getTask.GetTasksByRoomId(roomId);
+            if (tasks == null) return NotFound("Room of taken niet gevonden.");
+            return Ok(tasks);
         }
 
         [HttpPost("{roomId}/tasks/create")]
         public async Task<ActionResult> AddTask(Guid roomId, [FromBody] TaskDto dto)
         {
-            var room = await _db.Rooms.FindAsync(roomId);
-            if (room == null) return NotFound("Room niet gevonden.");
-            var newTask = new TaskItem(dto.Title, dto.Description, roomId);
+            var newTask = await _createTask.Execute(roomId, dto);
+            if (newTask == null) return NotFound("Room niet gevonden.");
 
-            _db.Tasks.Add(newTask);
-
-            await _db.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(AddTask), new { roomId = room.Id }, new
+            return CreatedAtAction(nameof(AddTask), new { roomId = roomId }, new
             {
                 Id = newTask.Id,
-                Name = newTask.Title
+                Title = newTask.Title,
+                Status = newTask.IsCompleted
             });
         }
 
         [HttpPut("{roomId}/tasks/{taskId}")]
          public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)
         {
-            var task = await _db.Tasks.FindAsync(taskId);
+            var task = await _updateTask.Execute(taskId, dto);
             if (task == null) return NotFound("Task niet gevonden.");
-            task.UpdateTask(dto.Title, dto.Description, dto.IsCompleted);
-            await _db.SaveChangesAsync();
-            return NoContent(); 
+            return Ok(task); 
         }
 
 
         [HttpDelete("{roomId}/tasks/{taskId}")]
         public async Task<ActionResult> DeleteTask(Guid roomId, Guid taskId)
         {
-            var task = await _db.Tasks.FindAsync(taskId);
+            var task = await _deleteTask.Execute(taskId);
             if (task == null) return NotFound("Task niet gevonden.");
-            _db.Tasks.Remove(task);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            return Ok( new
+            {
+                message = "De taak is verwijderd"
+            });
         }
     }
 }

@@ -70,11 +70,6 @@ namespace Infrastructure
             );
 
 
-            modelBuilder.Entity<Subtask>()
-                .HasOne(s => s.TaskItem)
-                .WithMany(t => t.Subtasks)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Expense>(entity =>
             {
                 entity.Property(e => e.Amount)

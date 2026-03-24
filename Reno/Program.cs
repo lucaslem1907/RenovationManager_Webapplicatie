@@ -1,10 +1,10 @@
-using Infrastructure;
-using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using Infrastructure;
+using Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +24,10 @@ builder.Services.AddAuthentication("Bearer")
         )
     };
 });
-builder.Services.AddScoped<PasswordService>();
-builder.Services.AddScoped<JwtService>();
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -64,16 +66,12 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+options.AddPolicy("AllowAll",
+    builder => builder
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
 });
-
-//DI
-builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 var app = builder.Build();
@@ -84,10 +82,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowAll");
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.MapControllers();
 app.Run();
