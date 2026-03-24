@@ -1,9 +1,10 @@
-﻿using Domain.Entities;
+﻿using Application.Subtaks;
+using Application.Tasks;
+using Domain.Entities;
 using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.JSInterop.Infrastructure;
-using Reno.DTO;
+using Shared.DTO;
 
 
 namespace Reno.Controllers
@@ -15,46 +16,61 @@ namespace Reno.Controllers
     public class SubtaskController : ControllerBase
     {
 
-        private readonly DatabaseContext _db;
 
-        public SubtaskController(DatabaseContext db)
+        private readonly GetSubtaskUseCase _getSubtask;
+        private readonly UpdateSubtaskUseCase _updateSubtask;
+        private readonly CreateSubTaskUseCase _createSubtask;
+        private readonly DeleteSubtaskUseCase _deleteSubtask;
+
+        public SubtaskController(GetSubtaskUseCase getSubtask,
+            UpdateSubtaskUseCase updateSubtask,
+            CreateSubTaskUseCase createSubtask,
+            DeleteSubtaskUseCase deleteSubtask)
         {
-            _db = db;
+            _createSubtask = createSubtask;
+            _deleteSubtask = deleteSubtask;
+            _updateSubtask = updateSubtask;
+            _getSubtask = getSubtask;
         }
-
         [HttpPost("{TaskItemId}")]
         public async Task<ActionResult<Subtask>> CreateSubTask([FromBody] SubTaskDto dto, Guid TaskItemId)
         {
-            var subtask = new Subtask(dto.Title, taskItemId: TaskItemId, dto.IsCompleted);
-            _db.Subtasks.Add(subtask);
-            await _db.SaveChangesAsync();
+            var newSubtask = await _createSubtask.Execute(TaskItemId, dto);
+            if (newSubtask == null) { BadRequest("taak niet kunnen aanmaken"); }
+            return CreatedAtAction(nameof(CreateSubTask), new { taskItemId = TaskItemId }, new
+            {
+                Id = newSubtask.Id,
+                Title = newSubtask.Title,
+                Status = newSubtask.IsCompleted
+            });
+        }
+
+        [HttpGet("{subtaskId}")]
+        public async Task<ActionResult<IEnumerable<TaskItem>>> getSubtask(Guid subtaskId)
+        {
+            var subtask = await _getSubtask.getSubTask(subtaskId);
+            if (subtask == null) return NotFound("subtaak niet gevonden.");
             return Ok(subtask);
         }
 
         [HttpPut("{subTaskId}")]
         public async Task<ActionResult<Subtask>> UpdateSubTask(SubTaskDto dto, Guid subTaskId)
         {
-            var subtask = await _db.Subtasks.FindAsync(subTaskId);
+            var subtask = await _updateSubtask.Execute(subTaskId, dto);
             if (subtask == null)
             {
                 return BadRequest("No Subtask Found");
             }
-            subtask.UpdateSubtask(
-                title: dto.Title,
-                status: dto.IsCompleted);
 
-            await _db.SaveChangesAsync();
-
-            return(Ok(subtask));
+            return (Ok(subtask));
         }
 
         [HttpDelete("{subtaskId}")]
         public async Task<ActionResult> DeleteSubTask(Guid subtaskId)
         {
-            var subtask = await _db.Subtasks.FindAsync(subtaskId);
-            _db.Subtasks.Remove(subtask);
-            await _db.SaveChangesAsync();
-            return Ok($"Removed Subtask");
+            var subtask = await _deleteSubtask.Execute(subtaskId);
+            if (!subtask) return BadRequest("Verwijderen niet gelukt");
+            return Ok(new { message = "Verwijderen subtask gelukt"});
         }
     }
 }

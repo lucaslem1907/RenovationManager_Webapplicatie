@@ -20,19 +20,24 @@ public class TaskItem
 
     public TaskItem() { }
 
-    public TaskItem(string title, string description, Guid roomId)
+    public TaskItem(string title, Guid roomId)
     {
         Id = Guid.NewGuid();
         Title = title;
-        Description = description;
+        Description = "";
         RoomId = roomId;
 
     }
 
-    public void UpdateTask(string title, string description, bool isCompleted)
+    public void UpdateTask(string? title, string? description, bool? isCompleted)
     {
-        Title = title;
-        Description = description;
+        Title = title ?? Title;
+        Description = description ?? Description;
+        IsCompleted = isCompleted ?? IsCompleted;
+    }
+
+    public void MarkAsCompleted(bool isCompleted)
+    {
         IsCompleted = isCompleted;
     }
 }

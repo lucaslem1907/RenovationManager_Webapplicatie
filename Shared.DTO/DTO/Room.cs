@@ -1,9 +1,10 @@
-﻿
-namespace Reno.DTO
+﻿using Domain.Enums;
+
+namespace Shared.DTO
 {
     public class RoomDto
     {
         public string Name { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public RoomStatus Status { get; set; }
     }
 }

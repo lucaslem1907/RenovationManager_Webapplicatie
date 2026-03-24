@@ -1,10 +1,11 @@
 ﻿using Domain.Entities;
-using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reno.DTO;
+using Shared.DTO;
 using System.Security.Claims;
+using Application.Projects;
+
 namespace Reno.Controllers
 {
     [Authorize]
@@ -12,75 +13,62 @@ namespace Reno.Controllers
     [Route("api/[controller]")]
     public class ProjectController : ControllerBase
     {
-        private readonly DatabaseContext _db;
+        private readonly CreateProjectUseCase _createProject;
+        private readonly GetProjectUseCase _getProject;
+        private readonly UpdateProjectUseCase _updateProject;
+        private readonly DeleteProjectUseCase _deleteProject;
 
-        public ProjectController(DatabaseContext db)
+
+        public ProjectController(
+            CreateProjectUseCase createProject,
+            GetProjectUseCase getProject,
+            UpdateProjectUseCase updateProject,
+            DeleteProjectUseCase deleteProject)
         {
-            _db = db;
+            _createProject = createProject;
+            _getProject = getProject;
+            _updateProject = updateProject;
+            _deleteProject = deleteProject;
         }
-
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
-        {
-            var projects = await _db.RenovationProjects.ToListAsync();
-            return Ok(projects);
-        }
-
-        
-        [HttpGet("{projectId}")]
-        public async Task<ActionResult<Project>> GetProject(Guid projectId)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var project = await _db.RenovationProjects
-                .Include(p => p.Rooms)
-                .ThenInclude(r => r.Tasks)
-                .Include(p=> p.Expenses)
-                .FirstOrDefaultAsync(p => p.Id == projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-            return Ok(project);
-        }
-
 
         [HttpPost("create")]
         public async Task<ActionResult<Project>> CreateProject([FromBody] ProjectDto dto)
         {
-            var owner = await _db.Users.FindAsync(dto.OwnerId);
-            if (owner == null) return NotFound("Owner niet gevonden.");
-
-            var project = new Project(dto.Name, owner, dto.Description);
-            await _db.AddAsync(project);
-            await _db.SaveChangesAsync();
+            var project = await _createProject.Execute(dto);
+            if (project == null) return NotFound("Project niet gevonden");
             return Ok(project);
-
         }
 
 
+        [HttpGet("{projectId}")]
+        public async Task<ActionResult<Project>> GetProject(Guid projectId)
+        {
+           //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var project = await _getProject.Execute(projectId);
+            if (project == null) return NotFound("Project niet gevonden.");
+            return Ok(project);
+        }
+
+        
         [HttpPut("{projectId}")]
 
         public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
         {
-            var project = await _db.RenovationProjects.FindAsync(projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-            project.UpdateProject(dto.Name, dto.Description, dto.Address, dto.Budget, dto.StartDate);
-            await _db.SaveChangesAsync();
+            var project = await _updateProject.Execute(projectId, dto);
+            if (project == null) return NotFound("Project niet gevonden."); 
             return Ok(project);
         }
-
+        
 
         [HttpDelete("{projectId}")]
         public async Task<ActionResult> DeleteProject(Guid projectId)
         {
-            var project = await _db.RenovationProjects.FindAsync(projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-
-            _db.RenovationProjects.Remove(project);
-            await _db.SaveChangesAsync();
-
+            var success = await _deleteProject.Execute(projectId);
+            if (!success) return NotFound("Project niet kunnen verwijderen.");
             return NoContent();
         }
 
-
+      
 
 
     }

@@ -27,4 +27,9 @@ public class Room
         Status = status;
     }
 
+    public void MarkCompleted()
+    {
+        Status = RoomStatus.done;
+    }
+
 }

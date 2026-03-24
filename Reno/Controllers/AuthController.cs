@@ -1,56 +1,37 @@
-﻿using Infrastructure;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Reno.DTO;
+using Shared.DTO;
+using Application.Users;
 
 namespace Reno.Controllers
 {
+    [ApiController]
+    [Route("/api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly DatabaseContext _db;
-        private readonly PasswordService _passwordService;
-        private readonly JwtService _jwtService;
+        private readonly RegisterUseCase _registerUseCase;
+        private readonly LoginUseCase _loginUseCase;
 
-        public AuthController(DatabaseContext db, PasswordService passwordService, JwtService jwtService)
+        public AuthController(RegisterUseCase registerUseCase, LoginUseCase loginUseCase)
         {
-            _db = db;
-            _passwordService = passwordService;
-            _jwtService = jwtService;
+            _registerUseCase = registerUseCase;
+            _loginUseCase = loginUseCase;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] DTO.UserRegisterDto RegisterDto)
+        public async Task<IActionResult> Register([FromBody] UserRegisterDto RegisterDto)
         {
-            if (await _db.Users.AnyAsync(u => u.Email == RegisterDto.Email))
-            {
-                return BadRequest("Email already in use.");
-            }
-            var hash = _passwordService.HashPassword(RegisterDto.Password);
-            var user = new User(
-                RegisterDto.FirstName,
-                RegisterDto.LastName,
-                RegisterDto.Email,
-                hash);
-
-            _db.Users.Add(user);
-
-            await _db.SaveChangesAsync();
-            return Ok(new { message = "User registered successfully." });
+            var succes = await _registerUseCase.Execute(RegisterDto);
+            if (!succes) { return BadRequest("Registeren van user mislukt"); }
+            return Ok(new {message = "user geregistreerd"});
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
         {
-            if (loginDto == null) { return BadRequest("login Emty"); }
-            var user = await _db.Users.FirstOrDefaultAsync(x => x.Login == loginDto.login);
-            if (user == null) { return NotFound("Login bestaat niet"); }
-
-            var valid = _passwordService.VerifyPassword(loginDto.password, user.PasswordHash);
-            if (!valid) { return BadRequest("Paswoord klopt niet"); }
-
-            var token = _jwtService.GenerateToken(user);
+            var (succes, token, user) = await _loginUseCase.Execute(loginDto);
+            if (!succes) { return BadRequest("Invalid login or password"); }
             return Ok(new
             {
                 token,

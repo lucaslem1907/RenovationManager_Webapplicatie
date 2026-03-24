@@ -1,4 +1,4 @@
-﻿namespace Reno.DTO
+﻿namespace Shared.DTO
 {
     public class ProjectDto
     {

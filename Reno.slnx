@@ -1,5 +1,11 @@
 <Solution>
+  <Project Path="Application/Application.csproj" Id="294e9e62-9d59-4de8-81ae-d955c7b15908">
+    <BuildDependency Project="Domain/Domain.csproj" />
+  </Project>
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" Id="b78e0185-93b4-45bb-b146-a2f96844d88b" />
-  <Project Path="Reno/Reno.csproj" />
+  <Project Path="Reno/Reno.csproj">
+    <BuildDependency Project="Application/Application.csproj" />
+  </Project>
+  <Project Path="Shared.DTO/Shared.csproj" Id="cabe8519-0699-437f-a9a6-b67e88451ffd" />
 </Solution>

@@ -1,11 +1,11 @@
-﻿using Domain.Entities;
-using Domain.Enums;
-using Infrastructure;
+﻿using Application.Expenses;
+using Application.Rooms;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Reno.DTO;
+using Shared.DTO;
 
 
 
@@ -18,54 +18,51 @@ namespace Reno.Controllers
     public class RoomController : ControllerBase
     {
 
-        public DatabaseContext _db;
+        private readonly CreateRoomUseCase _createRoom;
+        private readonly GetRoomUseCase _getRoom;
+        private readonly UpdateRoomUseCase _updateRoom;
+        private readonly DeleteRoomUseCase _deleteRoom;
 
-        public RoomController(DatabaseContext db)
+        public RoomController(CreateRoomUseCase createRoom, 
+            GetRoomUseCase getRoom, 
+            UpdateRoomUseCase updateRoom, 
+            DeleteRoomUseCase deleteRoom)
         {
-            _db = db;
+            _createRoom = createRoom;
+            _getRoom = getRoom;
+            _updateRoom = updateRoom;
+            _deleteRoom = deleteRoom;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
         {
-            var rooms = await _db.Rooms.ToListAsync();
-            if (rooms == null || rooms.Count == 0) { return NotFound(); }
+            var rooms = await _getRoom.GetAllRooms();
+            if (rooms == null) { return NotFound(); }
             return Ok(rooms);
         }
 
-        [HttpGet("{projectId}/rooms")]
-        public async Task<ActionResult<IEnumerable<Room>>> GetProjectRooms(Guid projectId)
+        [HttpGet("{roomid}")]
+        public async Task<ActionResult<IEnumerable<Room>>> GetRoomWithId(Guid roomid)
         {
-            var project = await _db.RenovationProjects.
-                Include(p => p.Rooms)
-                .ThenInclude(p=> p.Tasks)
-                .FirstOrDefaultAsync(p => p.Id == projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-            return Ok(project.Rooms);
+            var room = await _getRoom.GetRoomWithTaskAndSubTasks(roomid);
+            if (room == null) return NotFound("Room niet gevonden.");
+            return Ok(room);
         }
 
         [HttpPost("{projectId}/room/create")]
         public async Task<ActionResult> AddRoom(Guid projectId, [FromBody] RoomDto dto)
         {
-            var project = await _db.RenovationProjects.FindAsync(projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-
-            var newRoom = new Room
-            {
-                Name = dto.Name,
-                Status = Enum.Parse<RoomStatus>(dto.Status),
-                ProjectId = project.Id
-            };
-
-            _db.Rooms.Add(newRoom);
+            var newRoom = await _createRoom.Execute(projectId, dto);
+            if (newRoom == null) return BadRequest("creatie van kamer mislukt");
 
 
-            await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(AddRoom), new { projectId = project.Id }, new
+            return CreatedAtAction(nameof(AddRoom), new { projectId = projectId }, new
             {
                 Id = newRoom.Id,
-                Name = newRoom.Name
+                Name = newRoom.Name,
+                Status = newRoom.Status
             });
         }
 
@@ -73,27 +70,10 @@ namespace Reno.Controllers
         [HttpDelete("{roomId}")]
         public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses = false)
         {
-            var room = await _db.Rooms.Include(r => r.Expenses).FirstOrDefaultAsync(r => r.Id == roomId);
-            if (room == null) return NotFound("Room not found.");
-
-            if (deleteExpenses)
-            {
-                // delete all expenses for this room
-                _db.Expenses.RemoveRange(room.Expenses);
-            }
-            else
-            {
-                // set roomId to null on expenses
-                foreach (var expense in room.Expenses)
-                {
-                    expense.RoomId = null;
-                }
-            }
-
-            _db.Rooms.Remove(room);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
+            if (!succes) return NotFound("Room not found.");
+                    
+            return Ok(new {message = "Room is verwijderd"});
         }
     }
 }
