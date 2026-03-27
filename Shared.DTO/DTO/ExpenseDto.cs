@@ -11,6 +11,8 @@
 
         public decimal Amount { get; set; }
 
+        public bool ForceBudget { get; set; }
+
 
     }
 }

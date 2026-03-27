@@ -3,6 +3,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
+using FluentResults;
 
 namespace Reno.Controllers
 {
@@ -18,12 +19,12 @@ namespace Reno.Controllers
         private readonly DeleteExpenseUseCase _deleteExpense;
 
         public ExpenseController(
-            CreateExpenseUseCase createExpense, 
-            GetExpenseUseCase getExpense, 
+            CreateExpenseUseCase createExpense,
+            GetExpenseUseCase getExpense,
             UpdateExpenseUseCase updateExpense,
             DeleteExpenseUseCase deleteExpense)
         {
-            _createExpense = createExpense; 
+            _createExpense = createExpense;
             _getExpense = getExpense;
             _updateExpense = updateExpense;
             _deleteExpense = deleteExpense;
@@ -33,20 +34,21 @@ namespace Reno.Controllers
         public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
         {
             var expense = await _createExpense.Execute(projectId, dto);
-            if (expense == null) { return BadRequest("Expense niet kunnen maken"); }
+            if (expense.IsFailed)
+            {
+                return BadRequest(expense.Errors.Select(e => e.Message));
+            }
 
-            return CreatedAtAction(nameof(CreateExpense),
-                new
-                {
-                    projectId = expense.Id,
-                    Name = expense.Name,
-                    Amount = expense.Amount,
-                    RoomId = expense.RoomId
-
-                });
+            return Ok(new
+            {
+                expense.Value.Name,
+                expense.Value.Amount,
+                expense.Value.Id,
+                expense.Value.Status
+            });
 
         }
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
         {
