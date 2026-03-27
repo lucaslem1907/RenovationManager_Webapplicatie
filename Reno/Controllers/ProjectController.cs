@@ -1,10 +1,12 @@
-﻿using Domain.Entities;
+﻿using Application.Projects;
+using Application.Services;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shared.DTO;
 using System.Security.Claims;
-using Application.Projects;
 
 namespace Reno.Controllers
 {
@@ -17,18 +19,21 @@ namespace Reno.Controllers
         private readonly GetProjectUseCase _getProject;
         private readonly UpdateProjectUseCase _updateProject;
         private readonly DeleteProjectUseCase _deleteProject;
+        private readonly GenerateProjectExcel _generateExcelProject;
 
 
         public ProjectController(
             CreateProjectUseCase createProject,
             GetProjectUseCase getProject,
             UpdateProjectUseCase updateProject,
-            DeleteProjectUseCase deleteProject)
+            DeleteProjectUseCase deleteProject,
+            GenerateProjectExcel generateExcelProject)
         {
             _createProject = createProject;
             _getProject = getProject;
             _updateProject = updateProject;
             _deleteProject = deleteProject;
+            _generateExcelProject = generateExcelProject;
         }
 
         [HttpPost("create")]
@@ -66,6 +71,16 @@ namespace Reno.Controllers
             var success = await _deleteProject.Execute(projectId);
             if (!success) return NotFound("Project niet kunnen verwijderen.");
             return NoContent();
+        }
+
+        [HttpGet("{projectId}/GenerateExcel")]
+        public async Task<IActionResult> GenerateProjectExport (Guid projectId)
+        {
+            var file = await _generateExcelProject.GenerateExcel(projectId);
+            if (file == null) return NotFound("geen export kunnen maken");
+
+            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        $"project-{projectId}.xlsx");
         }
 
       

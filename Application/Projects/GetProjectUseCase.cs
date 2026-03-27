@@ -14,7 +14,7 @@ namespace Application.Projects
 
         public async Task<Project?> Execute(Guid id)
         {
-            return await _repo.GetById(id);
+            return await _repo.GetByIdWithDetails(id);
         }
     }
 }

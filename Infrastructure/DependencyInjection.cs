@@ -19,6 +19,7 @@ namespace Infrastructure
             services.AddScoped<JwtService>();
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IExportExcelService, GenerateExcelService> ();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();

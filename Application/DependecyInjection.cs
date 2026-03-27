@@ -1,6 +1,7 @@
 ﻿using Application.Expenses;
 using Application.Projects;
 using Application.Rooms;
+using Application.Services;
 using Application.Subtaks;
 using Application.Tasks;
 using Application.Users;
@@ -24,6 +25,7 @@ namespace Application
             services.AddScoped<GetProjectUseCase>();
             services.AddScoped<UpdateProjectUseCase>();
             services.AddScoped<DeleteProjectUseCase>();
+            services.AddScoped<GenerateProjectExcel>();
 
             services.AddScoped<CreateExpenseUseCase>();
             services.AddScoped<GetExpenseUseCase>();
