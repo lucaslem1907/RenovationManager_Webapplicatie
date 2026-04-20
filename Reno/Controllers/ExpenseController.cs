@@ -3,7 +3,6 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
-using FluentResults;
 
 namespace Reno.Controllers
 {
@@ -41,9 +40,10 @@ namespace Reno.Controllers
 
             return Ok(new
             {
-                expense.Value.Name,
+                description = expense.Value.Name,
                 expense.Value.Amount,
                 expense.Value.Id,
+                date = expense.Value.CreatedDate,
                 expense.Value.Status
             });
 

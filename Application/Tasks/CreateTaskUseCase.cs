@@ -8,7 +8,7 @@ namespace Application.Tasks
     {
         private readonly ITaskRepository _repo;
         private readonly IRoomRepository _roomRepository;
-        public CreateTaskUseCase(ITaskRepository repo, IRoomRepository roomRepo) 
+        public CreateTaskUseCase(ITaskRepository repo, IRoomRepository roomRepo)
         {
             _repo = repo;
             _roomRepository = roomRepo;
@@ -19,7 +19,7 @@ namespace Application.Tasks
             var room = await _roomRepository.GetRoomById(roomId);
             if (room == null) { return null; }
 
-            TaskItem task = new TaskItem( dto.Title, roomId);
+            TaskItem task = new TaskItem(dto.Title, roomId);
             await _repo.Add(task);
             await _repo.SaveChanges();
             return task;

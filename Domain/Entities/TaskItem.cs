@@ -2,7 +2,7 @@
 
 namespace Domain.Entities;
 
-public class TaskItem 
+public class TaskItem
 {
     public Guid Id { get; set; }
     public string Title { get; private set; }
@@ -11,8 +11,8 @@ public class TaskItem
     public bool IsCompleted { get; set; }
 
     public Guid RoomId { get; set; }
-        [JsonIgnore]
-    public Room Room { get;  set; } = null!;
+    [JsonIgnore]
+    public Room Room { get; set; } = null!;
 
 
     private readonly List<Subtask> _subtasks = new();

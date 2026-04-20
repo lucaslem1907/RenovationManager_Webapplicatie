@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.DTO;
 
 namespace Application.Users

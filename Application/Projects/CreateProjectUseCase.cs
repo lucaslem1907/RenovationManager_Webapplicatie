@@ -20,7 +20,7 @@ namespace Application.Projects
             var owner = await _userRepo.GetById(dto.OwnerId);
             if (owner == null) return null;
 
-            var project = new Project(dto.Name, owner, dto.Description);
+            var project = new Project(dto.Name, owner, dto.Address, dto.Description);
 
             await _repo.Add(project);
             await _repo.SaveChanges();

@@ -16,9 +16,9 @@ namespace Application.Expenses
         public async Task<IEnumerable<Expense>> GetExpensesByProjectId(Guid projectId)
         {
             var expenses = await _repo.GetExpensesByProjectId(projectId);
-                if (expenses == null) { return null; }
-            
-           return expenses;
+            if (expenses == null) { return null; }
+
+            return expenses;
 
         }
 

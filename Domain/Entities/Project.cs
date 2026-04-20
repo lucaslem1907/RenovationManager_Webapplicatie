@@ -1,8 +1,6 @@
-﻿using System.Xml.Linq;
+﻿namespace Domain.Entities;
 
-namespace Domain.Entities;
-
-public class Project 
+public class Project
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; }
@@ -23,9 +21,10 @@ public class Project
 
     private Project() { }
 
-    public Project(string name, User ownerId, string description = "")
+    public Project(string name, User ownerId, string? address, string description = "")
     {
         Id = Guid.NewGuid();
+        Address = address;
         Name = name;
         Owner = ownerId;
         Description = description;

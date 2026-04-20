@@ -1,9 +1,9 @@
-﻿using Infrastructure.Services;
+﻿using Application.Interfaces;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Application.Interfaces;
-using Infrastructure.Repositories;
 
 namespace Infrastructure
 {
@@ -13,13 +13,13 @@ namespace Infrastructure
         {
 
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<PasswordService>();
             services.AddScoped<JwtService>();
 
             services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IExportExcelService, GenerateExcelService> ();
+            services.AddScoped<IExportExcelService, GenerateExcelService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();

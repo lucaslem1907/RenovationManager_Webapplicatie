@@ -1,10 +1,10 @@
+using Application;
+using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-using Infrastructure;
-using Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication("Bearer")
 .AddJwtBearer(options =>
 {
+    if (string.IsNullOrEmpty(builder.Configuration["Jwt:Key"]))
+    {
+        throw new Exception("JWT Key is missing");
+    }
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -64,17 +69,33 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 builder.Services.AddCors(options =>
 {
-options.AddPolicy("AllowAll",
-    builder => builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader());
+    options.AddPolicy("AllowAll",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 });
 
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<DatabaseContext>();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+        throw;
+    }
+}
 
 // Configure pipeline
 if (app.Environment.IsDevelopment())
@@ -87,4 +108,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
+
+
+
 app.Run();

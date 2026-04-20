@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
-using Domain.Enums;
 using Shared.DTO;
 
 namespace Application.Expenses
@@ -18,7 +17,7 @@ namespace Application.Expenses
 
         public async Task<Room?> Execute(Guid projectId, RoomDto dto)
         {
-            var project = _projectrepo.GetById(projectId);
+            var project = await _projectrepo.GetById(projectId);
             if (project == null) { return null; }
 
             var newRoom = new Room

@@ -2,8 +2,8 @@
 {
     public enum RoomStatus
     {
-    not_started,
-    in_progress,
-    done
+        not_started,
+        in_progress,
+        done
     }
 }

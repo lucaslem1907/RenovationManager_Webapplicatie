@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Shared.DTO;
 
 namespace Reno.Controllers
@@ -18,9 +17,9 @@ namespace Reno.Controllers
         private readonly CreateTaskUseCase _createTask;
         private readonly DeleteTaskUseCase _deleteTask;
 
-        public TaskController(GetTaskUseCase getTask, 
-            UpdateTaskUseCase updateTask, 
-            CreateTaskUseCase createTask, 
+        public TaskController(GetTaskUseCase getTask,
+            UpdateTaskUseCase updateTask,
+            CreateTaskUseCase createTask,
             DeleteTaskUseCase deleteTask)
         {
             _createTask = createTask;
@@ -69,11 +68,11 @@ namespace Reno.Controllers
         }
 
         [HttpPut("{roomId}/tasks/{taskId}")]
-         public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)
+        public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)
         {
             var task = await _updateTask.Execute(taskId, dto);
             if (task == null) return NotFound("Task niet gevonden.");
-            return Ok(task); 
+            return Ok(task);
         }
 
 
@@ -82,7 +81,7 @@ namespace Reno.Controllers
         {
             var task = await _deleteTask.Execute(taskId);
             if (task == null) return NotFound("Task niet gevonden.");
-            return Ok( new
+            return Ok(new
             {
                 message = "De taak is verwijderd"
             });

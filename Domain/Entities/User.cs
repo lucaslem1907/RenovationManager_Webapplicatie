@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities;
-
-namespace Domain.Entities
+﻿namespace Domain.Entities
 {
-    public  class User
+    public class User
     {
         public Guid Id { get; private set; }
 
@@ -27,7 +20,7 @@ namespace Domain.Entities
         public User(string firstName, string lastName, string email, string passwordHash)
         {
             Id = Guid.NewGuid();
-            Login loginObj = new Login(firstName, lastName);
+            LoginGenerator loginObj = new LoginGenerator(firstName, lastName);
             Login = loginObj.Value;
             FirstName = firstName;
             LastName = lastName;
@@ -37,16 +30,16 @@ namespace Domain.Entities
         }
     }
 
-    public class  Login 
+    public class LoginGenerator
     {
         public string Value { get; private set; }
 
-        public Login(string firstname, string lastName)
+        public LoginGenerator(string firstname, string lastName)
         {
-            Value = Login.CreateLogin(firstname, lastName );
+            Value = LoginGenerator.CreateLogin(firstname, lastName);
         }
 
-        private Login() { }
+        private LoginGenerator() { }
 
         public static string CreateLogin(string firstname, string lastName)
         {

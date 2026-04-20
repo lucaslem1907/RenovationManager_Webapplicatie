@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-renovation
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: Test123
+      POSTGRES_DB: RenovationMANAGER
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  backend:
+    build:
+      context: C:\Users\lucasl\source\repos\lucaslem1907\RenovationManager_Webapplicatie
+      dockerfile: Dockerfile
+    container_name: backend-renovation
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DATABASE_URL: postgresql://testuser:Test123@postgres-renovation:5432/RenovationMANAGER
+      
+    depends_on:
+      - postgres
+    develop:
+      watch:
+        - action: sync
+          path: C:\Users\lucasl\source\repos\lucaslem1907\RenovationManager_Webapplicatie\Reno
+          target: /app/Reno
+          ignore:
+            - bin/
+            - obj/
+        - action: rebuild
+          path: C:\Users\lucasl\source\repos\lucaslem1907\RenovationManager_Webapplicatie\Reno\Reno.csproj
+
+  frontend:
+    build:
+      context: C:\Users\lucasl\source\RenoManager_Front
+      dockerfile: Dockerfile
+    container_name: frontend-renovation
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: C:\Users\lucasl\source\RenoManager_Front\src
+          target: /app/src
+          ignore:
+          - node_modules/
+        - action: rebuild
+          path: C:\Users\lucasl\source\RenoManager_Front\package.json
+
+volumes:
+  pgdata:

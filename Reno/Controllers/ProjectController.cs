@@ -1,12 +1,9 @@
 ﻿using Application.Projects;
 using Application.Services;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Shared.DTO;
-using System.Security.Claims;
 
 namespace Reno.Controllers
 {
@@ -48,22 +45,22 @@ namespace Reno.Controllers
         [HttpGet("{projectId}")]
         public async Task<ActionResult<Project>> GetProject(Guid projectId)
         {
-           //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var project = await _getProject.Execute(projectId);
             if (project == null) return NotFound("Project niet gevonden.");
             return Ok(project);
         }
 
-        
+
         [HttpPut("{projectId}")]
 
         public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
         {
             var project = await _updateProject.Execute(projectId, dto);
-            if (project == null) return NotFound("Project niet gevonden."); 
+            if (project == null) return NotFound("Project niet gevonden.");
             return Ok(project);
         }
-        
+
 
         [HttpDelete("{projectId}")]
         public async Task<ActionResult> DeleteProject(Guid projectId)
@@ -74,7 +71,7 @@ namespace Reno.Controllers
         }
 
         [HttpGet("{projectId}/GenerateExcel")]
-        public async Task<IActionResult> GenerateProjectExport (Guid projectId)
+        public async Task<IActionResult> GenerateProjectExport(Guid projectId)
         {
             var file = await _generateExcelProject.GenerateExcel(projectId);
             if (file == null) return NotFound("geen export kunnen maken");
@@ -83,7 +80,7 @@ namespace Reno.Controllers
         $"project-{projectId}.xlsx");
         }
 
-      
+
 
 
     }

@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Shared.DTO;
 using Domain.Entities;
-using Domain.Enums;
+using Shared.DTO;
 
 namespace Application.Expenses
 {

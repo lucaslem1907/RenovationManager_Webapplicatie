@@ -29,7 +29,7 @@ namespace Infrastructure.Repositories
 
         public async Task<TaskItem?> GetTask(Guid taskId)
         {
-            return await _db.Tasks.Include(c => c.Subtasks).FirstOrDefaultAsync(d => d.Id  == taskId);
+            return await _db.Tasks.Include(c => c.Subtasks).FirstOrDefaultAsync(d => d.Id == taskId);
         }
 
         public async Task<List<TaskItem?>> GetTasksByRoomId(Guid roomId)

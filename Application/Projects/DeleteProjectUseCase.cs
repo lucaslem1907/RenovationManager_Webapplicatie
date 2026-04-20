@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Domain.Entities;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 
 namespace Application.Projects
 {
@@ -10,7 +7,8 @@ namespace Application.Projects
 
         private readonly IProjectRepository _repo;
 
-        public DeleteProjectUseCase(IProjectRepository repo) {
+        public DeleteProjectUseCase(IProjectRepository repo)
+        {
             _repo = repo;
         }
 

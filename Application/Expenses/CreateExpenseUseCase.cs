@@ -1,8 +1,7 @@
 ﻿using Application.Interfaces;
-using Shared.DTO;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using FluentResults;
+using Shared.DTO;
 
 namespace Application.Expenses
 {
@@ -11,7 +10,7 @@ namespace Application.Expenses
         private readonly IExpenseRepository _repo;
         private readonly IProjectRepository _projectRepo;
 
-        public CreateExpenseUseCase(IExpenseRepository repo, IProjectRepository projectRepo )
+        public CreateExpenseUseCase(IExpenseRepository repo, IProjectRepository projectRepo)
         {
             _repo = repo;
             _projectRepo = projectRepo;
@@ -23,7 +22,7 @@ namespace Application.Expenses
             var expenses = await _repo.GetExpensesByProjectId(ProjectId);
             if (expenses == null) { return Result.Fail("Geen uitgaven gevonden"); }
             var project = await _projectRepo.GetById(ProjectId);
-            
+
 
             bool budget = BudgetOverschreden(expenses, dto.Amount, project.Budget, dto.ForceBudget);
             if (budget) { return Result.Fail("Budget is overschreden"); }
@@ -44,7 +43,7 @@ namespace Application.Expenses
             foreach (var item in expenses)
             {
                 currentBudget += item?.Amount ?? 0;
-            
+
             }
             var newBudget = currentBudget + amount;
 

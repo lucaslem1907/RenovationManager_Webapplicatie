@@ -42,7 +42,7 @@ namespace Infrastructure.Repositories
         {
             return await _db.Rooms.Include(x => x.Tasks)
                 .ThenInclude(x => x.Subtasks).FirstOrDefaultAsync(r => r.Id == roomId);
-                
+
         }
 
         public async Task SaveChanges()

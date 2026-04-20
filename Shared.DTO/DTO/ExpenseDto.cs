@@ -7,7 +7,7 @@
 
         public ExpenseStatus Status { get; set; }
 
-        public Guid RoomId { get; set; }
+        public Guid? RoomId { get; set; }
 
         public decimal Amount { get; set; }
 

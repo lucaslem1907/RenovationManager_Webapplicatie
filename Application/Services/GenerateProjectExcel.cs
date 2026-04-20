@@ -1,10 +1,5 @@
 ﻿using Application.Interfaces;
 using Shared.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -12,15 +7,15 @@ namespace Application.Services
     {
         private IExportExcelService _export;
         private IProjectRepository _project;
-        public GenerateProjectExcel(IExportExcelService export, IProjectRepository project) 
+        public GenerateProjectExcel(IExportExcelService export, IProjectRepository project)
         {
             _export = export;
             _project = project;
         }
 
-        public async Task<byte[]> GenerateExcel (Guid projectId)
+        public async Task<byte[]> GenerateExcel(Guid projectId)
         {
-            var project = await _project.GetByIdWithDetails (projectId);
+            var project = await _project.GetByIdWithDetails(projectId);
 
             var projectExportDto = new ProjectExportDto
             {
@@ -35,13 +30,13 @@ namespace Application.Services
                    .ToList(),
                 Expenses = project.Expenses
                     .Where(r => r.ProjectId == projectId)
-                    .Select(r => new ExpenseDto { Name = r.Name, Amount = r.Amount, Status = r.Status})
+                    .Select(r => new ExpenseDto { Name = r.Name, Amount = r.Amount, Status = r.Status })
                     .ToList(),
 
             };
 
             return _export.ProjectReport(projectExportDto);
-            
+
         }
     }
 }

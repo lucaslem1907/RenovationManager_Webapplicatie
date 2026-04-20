@@ -16,10 +16,10 @@ namespace Application.Expenses
         public async Task<IEnumerable<Room?>> GetRoomsByProjectId(Guid projectId)
         {
             var rooms = await _repo.GetRoomsByProjectId(projectId);
-                if (rooms == null) { return null; }
+            if (rooms == null) { return null; }
 
             return rooms;
-            
+
         }
 
         public async Task<IEnumerable<Room?>> GetAllRooms()

@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace Domain.Entities;
+﻿namespace Domain.Entities;
 
 public class Subtask
 {

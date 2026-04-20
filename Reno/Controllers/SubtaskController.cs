@@ -1,7 +1,6 @@
 ﻿using Application.Subtaks;
 using Application.Tasks;
 using Domain.Entities;
-using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
@@ -70,7 +69,7 @@ namespace Reno.Controllers
         {
             var subtask = await _deleteSubtask.Execute(subtaskId);
             if (!subtask) return BadRequest("Verwijderen niet gelukt");
-            return Ok(new { message = "Verwijderen subtask gelukt"});
+            return Ok(new { message = "Verwijderen subtask gelukt" });
         }
     }
 }

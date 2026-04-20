@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Users;
+using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
-using Application.Users;
 
 namespace Reno.Controllers
 {
@@ -24,7 +22,7 @@ namespace Reno.Controllers
         {
             var succes = await _registerUseCase.Execute(RegisterDto);
             if (!succes) { return BadRequest("Registeren van user mislukt"); }
-            return Ok(new {message = "user geregistreerd"});
+            return Ok(new { message = "user geregistreerd" });
         }
 
         [HttpPost("login")]
@@ -38,7 +36,8 @@ namespace Reno.Controllers
                 user = new
                 {
                     user.Id,
-                    user.Login
+                    user.Login,
+                    user.Projects
                 }
             }
 

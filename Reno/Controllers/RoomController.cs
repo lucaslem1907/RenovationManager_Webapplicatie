@@ -2,9 +2,7 @@
 using Application.Rooms;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Shared.DTO;
 
 
@@ -23,9 +21,9 @@ namespace Reno.Controllers
         private readonly UpdateRoomUseCase _updateRoom;
         private readonly DeleteRoomUseCase _deleteRoom;
 
-        public RoomController(CreateRoomUseCase createRoom, 
-            GetRoomUseCase getRoom, 
-            UpdateRoomUseCase updateRoom, 
+        public RoomController(CreateRoomUseCase createRoom,
+            GetRoomUseCase getRoom,
+            UpdateRoomUseCase updateRoom,
             DeleteRoomUseCase deleteRoom)
         {
             _createRoom = createRoom;
@@ -66,14 +64,21 @@ namespace Reno.Controllers
             });
         }
 
+        [HttpPut("{roomId}")]
+        public async Task<ActionResult> UpdateRoom(Guid roomId, [FromBody] RoomDto dto)
+        {
+            var room = await _updateRoom.Execute(roomId, dto);
+            if (room == null) return NotFound("Room niet gevonden.");
+            return Ok(room);
+        }
 
         [HttpDelete("{roomId}")]
         public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses = false)
         {
             var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
             if (!succes) return NotFound("Room not found.");
-                    
-            return Ok(new {message = "Room is verwijderd"});
+
+            return Ok(new { message = "Room is verwijderd" });
         }
     }
 }

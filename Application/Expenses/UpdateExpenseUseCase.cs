@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Shared.DTO;
 using Domain.Entities;
+using Shared.DTO;
 
 namespace Application.Expenses
 {
@@ -20,8 +19,10 @@ namespace Application.Expenses
             var expense = await _repo.GetExpenseById(expenseId);
             if (expense == null) { return null; }
 
+
             expense.Name = dto.Name;
             expense.Description = dto.Description;
+            expense.RoomId = dto.RoomId;
             expense.Amount = dto.Amount;
             expense.Status = dto.Status;
             await _repo.SaveChanges(); ;

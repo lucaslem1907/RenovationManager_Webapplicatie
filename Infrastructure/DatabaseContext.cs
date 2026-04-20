@@ -32,14 +32,12 @@ namespace Infrastructure
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
             });
 
             modelBuilder.Entity<Project>(entity =>
             {
                 entity.Property(p => p.Budget)
-                      .HasPrecision(18, 2);
+                      .HasColumnType("decimal(18,2)"); 
 
                 entity.HasMany(p => p.Rooms)
                 .WithOne(r => r.Project)
@@ -50,6 +48,11 @@ namespace Infrastructure
 
             modelBuilder.Entity<Room>(entity =>
             {
+                entity.HasKey(r => r.Id);
+                
+                entity.Property(r => r.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
 
                 entity.HasMany(r => r.Tasks)
                 .WithOne(t => t.Room)
@@ -60,20 +63,20 @@ namespace Infrastructure
 
             modelBuilder.Entity<TaskItem>(entity =>
             {
+                entity.HasKey(t => t.Id);
 
                 entity.HasMany(t => t.Subtasks)
                 .WithOne(s => s.TaskItem)
                 .HasForeignKey(s => s.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            }
-            );
+            });
+            
 
 
             modelBuilder.Entity<Expense>(entity =>
             {
                 entity.Property(e => e.Amount)
-                .HasPrecision(18, 2);
+                    .HasColumnType("decimal(18,2)");  // Use HasColumnType for PostgreSQL
 
                 entity.HasKey(e => e.Id);
 
@@ -86,13 +89,7 @@ namespace Infrastructure
                 .WithMany(r => r.Expenses)
                 .HasForeignKey(e => e.RoomId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            }
-
-            );
-
-
-
+            });
         }
 
     }

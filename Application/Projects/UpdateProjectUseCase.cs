@@ -1,9 +1,6 @@
-﻿using Shared.DTO;
+﻿using Application.Interfaces;
 using Domain.Entities;
-
-
-using Microsoft.AspNetCore.Http.HttpResults;
-using Application.Interfaces;
+using Shared.DTO;
 
 namespace Application.Projects
 {
@@ -23,7 +20,7 @@ namespace Application.Projects
             project.UpdateProject(dto.Name, dto.Description, dto.Address, dto.Budget, dto.StartDate);
             await _repo.SaveChanges();
             return project;
-        
+
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using Domain.Enums;
+﻿using Domain.Enums;
+using System.Text.Json.Serialization;
 namespace Domain.Entities;
 
-public class Room 
+public class Room
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
 
-    public RoomStatus Status { get; set; } 
+    public RoomStatus Status { get; set; }
 
     public Guid ProjectId { get; set; }
 

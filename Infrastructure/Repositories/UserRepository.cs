@@ -1,11 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -40,7 +35,7 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetByLogin(string login)
         {
-            return await _db.Users.FirstOrDefaultAsync(u => u.Login == login);
+            return await _db.Users.Include(u => u.Projects).FirstOrDefaultAsync(u => u.Login == login);
         }
 
         public async Task SaveChanges()

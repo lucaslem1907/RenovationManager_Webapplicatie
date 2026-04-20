@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using ClosedXML.Excel;
 using Shared.DTO;
-using System;
 
 
 namespace Infrastructure.Services
@@ -93,8 +92,8 @@ namespace Infrastructure.Services
 
                 sheet3.Cell(expensestarter, 2).Style.NumberFormat.Format = "€ #,##0.00";
 
-                if (sheet3.Cell(expensestarter, 3).Value.ToString() == "unpaid") 
-                {sheet3.Cell(expensestarter, 3).Style.Font.FontColor = XLColor.Red; }
+                if (sheet3.Cell(expensestarter, 3).Value.ToString() == "unpaid")
+                { sheet3.Cell(expensestarter, 3).Style.Font.FontColor = XLColor.Red; }
 
                 expensestarter++;
             }
