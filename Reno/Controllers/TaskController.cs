@@ -63,7 +63,8 @@ namespace Reno.Controllers
             {
                 Id = newTask.Id,
                 Title = newTask.Title,
-                Status = newTask.IsCompleted
+                Status = newTask.IsCompleted,
+                RoomStatus = newTask.Room.Status
             });
         }
 

@@ -31,5 +31,9 @@ public class Room
     {
         Status = RoomStatus.done;
     }
+        public void MarkInProgress()
+    {
+        Status = RoomStatus.in_progress;
+    }
 
 }

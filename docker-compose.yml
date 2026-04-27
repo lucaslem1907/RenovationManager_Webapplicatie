@@ -27,13 +27,45 @@ services:
     develop:
       watch:
         - action: sync
-          path: C:\Users\lucasl\source\repos\lucaslem1907\RenovationManager_Webapplicatie\Reno
+          path: ./Reno
           target: /app/Reno
           ignore:
             - bin/
             - obj/
+        - action: sync
+          path: ./Application
+          target: /app/Application
+          ignore:
+            - bin/
+            - obj/
+        - action: sync
+          path: ./Domain
+          target: /app/Domain
+          ignore:
+            - bin/
+            - obj/
+        - action: sync
+          path: ./Infrastructure
+          target: /app/Infrastructure
+          ignore:
+            - bin/
+            - obj/
+        - action: sync
+          path: ./Shared.DTO
+          target: /app/Shared.DTO
+          ignore:
+            - bin/
+            - obj/
         - action: rebuild
-          path: C:\Users\lucasl\source\repos\lucaslem1907\RenovationManager_Webapplicatie\Reno\Reno.csproj
+          path: ./Reno/Reno.csproj
+        - action: rebuild
+          path: ./Application/Application.csproj
+        - action: rebuild
+          path: ./Domain/Domain.csproj
+        - action: rebuild
+          path: ./Infrastructure/Infrastructure.csproj
+        - action: rebuild
+          path: ./Shared.DTO/Shared.csproj
 
   frontend:
     build:

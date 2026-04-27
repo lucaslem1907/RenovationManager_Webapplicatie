@@ -8,17 +8,17 @@ namespace Reno.Controllers
     [Route("/api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly GetUserProjectsUseCase _GetUser;
+        private readonly GetUserProjectsUseCase _GetUserProjects;
 
         public UserController(GetUserProjectsUseCase getuser)
         {
-            _GetUser = getuser;
+            _GetUserProjects = getuser;
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUserProjects(Guid userId)
+        public async Task<ActionResult<IEnumerable<Project>>> GetUserProjects(Guid userId)
         {
-            var userProjects = await _GetUser.Execute(userId);
+            var userProjects = await _GetUserProjects.Execute(userId);
             if (userProjects == null) { return BadRequest("geen projecten voor deze user"); }
             return Ok(userProjects);
         }

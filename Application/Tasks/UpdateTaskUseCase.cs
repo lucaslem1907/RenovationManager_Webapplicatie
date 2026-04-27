@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Shared.DTO;
+using Domain.Enums;
 
 namespace Application.Tasks
 {
@@ -24,12 +25,17 @@ namespace Application.Tasks
             task.UpdateTask(dto.Title, dto.Description, dto.IsCompleted);
 
             var room = await _roomRepo.GetRoomWithTaskAndSubTasks(task.RoomId);
-            var inCompletedTasks = room.Tasks.Where(i => i.IsCompleted);
+            var IncompletedTasks = room.Tasks.Where(i => !i.IsCompleted);
 
-            if (inCompletedTasks.Any())
+            if (!IncompletedTasks.Any())
             {
 
                 room.MarkCompleted();
+            }
+
+            if (IncompletedTasks.Any() && room.Status == RoomStatus.done)
+            {
+                room.MarkInProgress();
             }
 
             await _repo.SaveChanges();

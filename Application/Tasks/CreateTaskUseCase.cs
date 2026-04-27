@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Shared.DTO;
+using Domain.Enums;
 
 namespace Application.Tasks
 {
@@ -16,12 +17,20 @@ namespace Application.Tasks
 
         public async Task<TaskItem> Execute(Guid roomId, TaskDto dto)
         {
+
             var room = await _roomRepository.GetRoomById(roomId);
             if (room == null) { return null; }
 
+
             TaskItem task = new TaskItem(dto.Title, roomId);
+            if (room.Status == RoomStatus.done)
+            {
+                room.MarkInProgress();
+            }
             await _repo.Add(task);
+            await _roomRepository.SaveChanges();
             await _repo.SaveChanges();
+
             return task;
 
         }

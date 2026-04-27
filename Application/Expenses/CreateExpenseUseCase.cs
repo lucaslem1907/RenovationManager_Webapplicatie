@@ -20,7 +20,6 @@ namespace Application.Expenses
         public async Task<Result<Expense?>> Execute(Guid ProjectId, ExpenseDto dto)
         {
             var expenses = await _repo.GetExpensesByProjectId(ProjectId);
-            if (expenses == null) { return Result.Fail("Geen uitgaven gevonden"); }
             var project = await _projectRepo.GetById(ProjectId);
 
 

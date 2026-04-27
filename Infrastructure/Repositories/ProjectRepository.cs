@@ -22,7 +22,10 @@ namespace Infrastructure.Repositories
         {
             return await _db.RenovationProjects.FindAsync(id);
         }
-
+        public async Task<List<Project>> GetProjectsByUserId(Guid userId)
+        {
+            return await _db.RenovationProjects.Where(p => p.OwnerId == userId).ToListAsync();
+        }
         public async Task<Project?> GetByIdWithDetails(Guid id)
         {
             return await _db.RenovationProjects

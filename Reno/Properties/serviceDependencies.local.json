@@ -1,8 +1,12 @@
 {
   "dependencies": {
-    "secrets1": {
-      "type": "secrets.user",
-      "dynamicId": null
+    "mssql1": {
+      "ignored": "true",
+      "type": "mssql"
+    },
+    "postgresql1": {
+      "ignored": "true",
+      "type": "postgresql"
     }
   }
 }

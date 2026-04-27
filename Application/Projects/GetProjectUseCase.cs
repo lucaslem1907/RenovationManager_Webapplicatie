@@ -16,5 +16,6 @@ namespace Application.Projects
         {
             return await _repo.GetByIdWithDetails(id);
         }
+
     }
 }

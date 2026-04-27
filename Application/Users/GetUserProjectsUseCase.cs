@@ -5,19 +5,19 @@ namespace Application.Tasks
 {
     public class GetUserProjectsUseCase
     {
-        private readonly IUserRepository _repo;
-        public GetUserProjectsUseCase(IUserRepository repo)
+        private readonly IProjectRepository _repo;
+        public GetUserProjectsUseCase(IProjectRepository repo)
         {
             _repo = repo;
 
         }
 
-        public async Task<User> Execute(Guid UserId)
+        public async Task<List<Project>> Execute(Guid UserId)
         {
-            var user = await _repo.GetById(UserId);
-            if (user == null) { return null; }
+            var projects = await _repo.GetProjectsByUserId(UserId);
+            if (projects == null) { return null; }
 
-            return user;
+            return projects;
 
         }
     }
