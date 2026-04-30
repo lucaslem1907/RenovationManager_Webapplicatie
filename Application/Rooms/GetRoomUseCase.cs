@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 
-namespace Application.Expenses
+namespace Application.Rooms
 {
     public class GetRoomUseCase
     {

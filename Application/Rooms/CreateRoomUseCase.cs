@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Shared.DTO;
 
-namespace Application.Expenses
+namespace Application.Rooms
 {
     public class CreateRoomUseCase
     {

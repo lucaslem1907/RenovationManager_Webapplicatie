@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="Application.Tests/Application.Tests.csproj">
+    <BuildDependency Project="Application/Application.csproj" />
+  </Project>
   <Project Path="Application/Application.csproj" Id="294e9e62-9d59-4de8-81ae-d955c7b15908">
     <BuildDependency Project="Domain/Domain.csproj" />
   </Project>

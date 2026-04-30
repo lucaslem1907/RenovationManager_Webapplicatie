@@ -25,6 +25,7 @@ namespace Application.Expenses
             expense.RoomId = dto.RoomId;
             expense.Amount = dto.Amount;
             expense.Status = dto.Status;
+            expense.CreatedDate = dto.CreatedDate;
             await _repo.SaveChanges(); ;
             return expense;
         }
