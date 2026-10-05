@@ -19,9 +19,12 @@ namespace Application.Expenses
 
         public async Task<Result<Expense?>> Execute(Guid ProjectId, ExpenseDto dto)
         {
+            var project = await _projectRepo.GetById(ProjectId)
+            if (project == null)
+            {
+                return Result.Fail("Project not found");
+            }
             var expenses = await _repo.GetExpensesByProjectId(ProjectId);
-            var project = await _projectRepo.GetById(ProjectId);
-
 
             bool budget = BudgetOverschreden(expenses, dto.Amount, project.Budget, dto.ForceBudget);
             if (budget) { return Result.Fail("Budget is overschreden"); }
