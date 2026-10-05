@@ -17,19 +17,22 @@ namespace Application.Expenses
 
         }
 
-        public async Task<Result<Expense?>> Execute(Guid ProjectId, ExpenseDto dto)
+        public async Task<Result<Expense?>> Execute(Guid projectId, ExpenseDto dto)
         {
-            var project = await _projectRepo.GetById(ProjectId)
+            var project = await _projectRepo.GetById(ProjectId);
             if (project == null)
             {
                 return Result.Fail("Project not found");
             }
+
+            if (budget)
+            {
+                return Result.Fail("Budget is overschreden");
+            }
             var expenses = await _repo.GetExpensesByProjectId(ProjectId);
 
-            bool budget = BudgetOverschreden(expenses, dto.Amount, project.Budget, dto.ForceBudget);
-            if (budget) { return Result.Fail("Budget is overschreden"); }
 
-            var newExpense = new Expense(dto.Amount, dto.Name, ProjectId, dto.RoomId, dto.Description, dto.Status);
+            var newExpense = new Expense(dto.Amount, dto.Name, projectId, dto.RoomId, dto.Description, dto.Status);
             await _repo.Add(newExpense);
             await _repo.SaveChanges();
 
