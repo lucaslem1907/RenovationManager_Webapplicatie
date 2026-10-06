@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Shared.Builders.DtoBuilders;
 using Application.Projects;
 using Shared.DTO;
 using Domain.Entities;
@@ -19,16 +20,13 @@ namespace Application.Tests.ProjectTestUseCases
             var user = new User("Voornaam", "Achternaam", "voornaam.achternaam@email.com", "passwordHash");
             var project = new Project("oude naam", user, "oud adress");
 
-            var ProjectDto = new ProjectDto
-            {
-                Name = "Aangepaste Naam",
-                OwnerId = user.Id,
-                Address = "Aangepast Adres",
-                Description = "toevoegen beschrijving",
-                Budget = 10000,
-                StartDate = DateTime.Now
-
-            };
+            var ProjectDto = new ProjectDtoBuilder()
+                .WithName("Aangepaste Naam")
+                .WithAddress("Aangepast Adres")
+                .WithDescription("toevoegen beschrijving")
+                .WithBudget(10000)
+                .WithStartDate(DateTime.Now)
+                .Build();
 
             //ophalen van project
             mockProjectRepo.Setup(repo => repo.GetById(project.Id)).ReturnsAsync(project);
