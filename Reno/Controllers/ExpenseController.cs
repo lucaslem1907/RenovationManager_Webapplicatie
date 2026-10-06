@@ -3,6 +3,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
+using Application.Exceptions;
 
 namespace Reno.Controllers
 {
@@ -32,22 +33,34 @@ namespace Reno.Controllers
         [HttpPost("{projectId}/create")]
         public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
         {
-            var expense = await _createExpense.Execute(projectId, dto);
-            if (expense.IsFailed)
+            try
             {
-                return BadRequest(expense.Errors.Select(e => e.Message));
+                var expense = await _createExpense.Execute(projectId, dto);
+                return Ok(new
+                {
+                    expense.Name,
+                    expense.Amount,
+                    expense.Id,
+                    date = expense.CreatedDate,
+                    expense.Status
+                });
             }
-
-            return Ok(new
+            catch (ProjectNotFoundException ex)
             {
-                description = expense.Value.Name,
-                expense.Value.Amount,
-                expense.Value.Id,
-                date = expense.Value.CreatedDate,
-                expense.Value.Status
-            });
-
+                return NotFound(ex.Message);
+            }
+            catch (BudgetExceededException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (RoomNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
+
+
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
@@ -73,17 +86,31 @@ namespace Reno.Controllers
         [HttpPut("{expenseId}/update")]
         public async Task<ActionResult> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
         {
-            var expense = await _updateExpense.Execute(expenseId, dto);
-            if (expense == null) { return NotFound(); }
-            return Ok(expense);
+            try
+            {
+                var expense = await _updateExpense.Execute(expenseId, dto);
+                if (expense == null) { return NotFound(); }
+                return Ok(expense);
+            }
+            catch (ExpenseNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{expenseId}/delete")]
         public async Task<ActionResult> DeleteExpense(Guid expenseId)
         {
-            var success = await _deleteExpense.Execute(expenseId);
-            if (!success) return NotFound("Expense niet kunnen verwijderen.");
-            return NoContent();
+            try
+            {
+                var success = await _deleteExpense.Execute(expenseId);
+                if (!success) return NotFound("Expense niet kunnen verwijderen.");
+                return NoContent();
+            }
+            catch (ExpenseNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

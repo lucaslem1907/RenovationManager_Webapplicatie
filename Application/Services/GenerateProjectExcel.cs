@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Shared.DTO;
 
 namespace Application.Services
@@ -16,6 +17,10 @@ namespace Application.Services
         public async Task<byte[]> GenerateExcel(Guid projectId)
         {
             var project = await _project.GetByIdWithDetails(projectId);
+            if (project == null)
+            {
+                throw new ProjectNotFoundException(projectId);
+            }
 
             var projectExportDto = new ProjectExportDto
             {

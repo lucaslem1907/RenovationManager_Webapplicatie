@@ -6,6 +6,7 @@ namespace Application.Interfaces
     {
         Task<List<Expense>> GetAll();
         Task<IEnumerable<Expense?>> GetExpensesByProjectId(Guid projectid);
+        Task<IEnumerable<Expense?>> GetExpensesByRoomId(Guid roomId);
         Task<Expense?> GetExpenseById(Guid id);
         Task Add(Expense expense);
         Task Delete(Expense expense);

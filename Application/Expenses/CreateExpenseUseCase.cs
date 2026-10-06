@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
-using FluentResults;
 using Shared.DTO;
 
 namespace Application.Expenses
@@ -9,34 +9,43 @@ namespace Application.Expenses
     {
         private readonly IExpenseRepository _repo;
         private readonly IProjectRepository _projectRepo;
+        private readonly IRoomRepository _roomRepo;
 
-        public CreateExpenseUseCase(IExpenseRepository repo, IProjectRepository projectRepo)
+        public CreateExpenseUseCase(IExpenseRepository repo, IProjectRepository projectRepo, IRoomRepository roomRepo)
         {
             _repo = repo;
             _projectRepo = projectRepo;
-
+            _roomRepo = roomRepo;
         }
 
-        public async Task<Result<Expense?>> Execute(Guid projectId, ExpenseDto dto)
+        public async Task<Expense?> Execute(Guid projectId, ExpenseDto dto)
         {
-            var project = await _projectRepo.GetById(ProjectId);
+            var project = await _projectRepo.GetById(projectId);
             if (project == null)
             {
-                return Result.Fail("Project not found");
+                throw new ProjectNotFoundException(projectId);
             }
-
-            if (budget)
+            if (dto.RoomId.HasValue)
             {
-                return Result.Fail("Budget is overschreden");
+                var room = await _roomRepo.GetRoomById(dto.RoomId.Value);
+                if (room == null)
+                {
+                    throw new RoomNotFoundException(dto.RoomId.Value);
+                }
             }
-            var expenses = await _repo.GetExpensesByProjectId(ProjectId);
+            var expenses = await _repo.GetExpensesByProjectId(projectId);
+            var budgetExceeded = BudgetOverschreden(expenses, dto.Amount, project.Budget, dto.ForceBudget);
+            if (budgetExceeded)
+            {
+                throw new BudgetExceededException(project.Budget);
+            }
 
 
             var newExpense = new Expense(dto.Amount, dto.Name, projectId, dto.RoomId, dto.Description, dto.Status);
             await _repo.Add(newExpense);
             await _repo.SaveChanges();
 
-            return Result.Ok(newExpense);
+            return newExpense;
         }
 
         private bool BudgetOverschreden(IEnumerable<Expense?> expenses, decimal amount, decimal? totalBudget, bool? force)

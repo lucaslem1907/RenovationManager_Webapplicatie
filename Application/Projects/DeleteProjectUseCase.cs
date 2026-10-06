@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 
 namespace Application.Projects
 {
@@ -15,8 +16,10 @@ namespace Application.Projects
         public async Task<bool> Execute(Guid id)
         {
             var project = await _repo.GetById(id);
-            if (project == null) return false;
-
+            if (project == null)
+            {
+                throw new ProjectNotFoundException(id);
+            }
             await _repo.Delete(project);
             await _repo.SaveChanges();
             return true;

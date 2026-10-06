@@ -1,4 +1,5 @@
 ﻿using Application.Expenses;
+using Application.Exceptions;
 using Application.Rooms;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -35,50 +36,88 @@ namespace Reno.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
         {
-            var rooms = await _getRoom.GetAllRooms();
-            if (rooms == null) { return NotFound(); }
-            return Ok(rooms);
+            try
+            {
+                var rooms = await _getRoom.GetAllRooms();
+                return Ok(rooms);
+            }
+            catch (BaseException ex)
+            {
+
+                return NotFound(new {ex.ErrorCode, ex.Message});
+            }
+            
         }
 
         [HttpGet("{roomid}")]
         public async Task<ActionResult<IEnumerable<Room>>> GetRoomWithId(Guid roomid)
         {
-            var room = await _getRoom.GetRoomWithTaskAndSubTasks(roomid);
-            if (room == null) return NotFound("Room niet gevonden.");
-            return Ok(room);
+            try
+            {
+                var room = await _getRoom.GetRoomWithTaskAndSubTasks(roomid);
+                return Ok(room);
+            }
+            catch (BaseException ex)
+            {
+                return NotFound(new {ex.ErrorCode, ex.Message});
+            }
+            
+                        
         }
 
         [HttpPost("{projectId}/room/create")]
         public async Task<ActionResult> AddRoom(Guid projectId, [FromBody] RoomDto dto)
         {
-            var newRoom = await _createRoom.Execute(projectId, dto);
-            if (newRoom == null) return BadRequest("creatie van kamer mislukt");
 
-
-
-            return CreatedAtAction(nameof(AddRoom), new { projectId = projectId }, new
+            try
             {
-                Id = newRoom.Id,
-                Name = newRoom.Name,
-                Status = newRoom.Status
-            });
+                var newRoom = await _createRoom.Execute(projectId, dto);
+                return CreatedAtAction(nameof(AddRoom), new { projectId = projectId }, new
+                {
+                    Id = newRoom.Id,
+                    Name = newRoom.Name,
+                    Status = newRoom.Status
+                });
+            }
+            catch (BaseException ex)
+            {
+
+               return NotFound(new {ex.ErrorCode, ex.Message});
+            }
         }
 
         [HttpPut("{roomId}")]
         public async Task<ActionResult> UpdateRoom(Guid roomId, [FromBody] RoomDto dto)
         {
-            var room = await _updateRoom.Execute(roomId, dto);
-            if (room == null) return NotFound("Room niet gevonden.");
-            return Ok(room);
+
+            try
+            {
+                var room = await _updateRoom.Execute(roomId, dto);
+                return Ok(room);
+            }
+            catch (BaseException ex)
+            {
+
+                return NotFound(new {ex.ErrorCode, ex.Message});
+            }
+            
+            
+            
         }
 
         [HttpDelete("{roomId}")]
-        public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses = false)
+        public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses)
         {
-            var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
-            if (!succes) return NotFound("Room not found.");
-
-            return Ok(new { message = "Room is verwijderd" });
+            try
+            {
+                var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
+                return Ok(new { message = "Room has been deleted" });
+            }
+            catch (BaseException ex)
+            {
+                return BadRequest(new {ex.ErrorCode, ex.Message});
+            }
+            
         }
     }
 }

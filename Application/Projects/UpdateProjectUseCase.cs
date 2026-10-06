@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -16,7 +17,10 @@ namespace Application.Projects
         public async Task<Project?> Execute(Guid projectId, ProjectDto dto)
         {
             var project = await _repo.GetById(projectId);
-            if (project == null) return null;
+            if (project == null)
+            { 
+                throw new ProjectNotFoundException(projectId); 
+            }
             project.UpdateProject(dto.Name, dto.Description, dto.Address, dto.Budget, dto.StartDate);
             await _repo.SaveChanges();
             return project;

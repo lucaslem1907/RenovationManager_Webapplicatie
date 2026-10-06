@@ -1,5 +1,6 @@
 ﻿using Application.Projects;
 using Application.Services;
+using Application.Exceptions;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,49 +37,80 @@ namespace Reno.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Project>> CreateProject([FromBody] ProjectDto dto)
         {
-            var project = await _createProject.Execute(dto);
-            if (project == null) return NotFound("Project niet gevonden");
-            return Ok(project);
+            try
+            {
+                var result = await _createProject.Execute(dto);
+                return Ok(result);
+            }
+            catch (OwnerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
 
         [HttpGet("{projectId}")]
         public async Task<ActionResult<Project>> GetProject(Guid projectId)
         {
-            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var project = await _getProject.Execute(projectId);
-            if (project == null) return NotFound("Project niet gevonden.");
-            return Ok(project);
-        }
-
-
-        [HttpPut("{projectId}")]
-
-        public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
-        {
-            var project = await _updateProject.Execute(projectId, dto);
-            if (project == null) return NotFound("Project niet gevonden.");
-            return Ok(project);
-        }
-
-
-        [HttpDelete("{projectId}")]
-        public async Task<ActionResult> DeleteProject(Guid projectId)
-        {
-            var success = await _deleteProject.Execute(projectId);
-            if (!success) return NotFound("Project niet kunnen verwijderen.");
-            return NoContent();
+            try
+            {
+                var project = await _getProject.Execute(projectId);
+                return Ok(project);
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpGet("{projectId}/GenerateExcel")]
         public async Task<IActionResult> GenerateProjectExport(Guid projectId)
         {
-            var file = await _generateExcelProject.GenerateExcel(projectId);
-            if (file == null) return NotFound("geen export kunnen maken");
-
-            return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            try
+            {
+                var file = await _generateExcelProject.GenerateExcel(projectId);
+                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         $"project-{projectId}.xlsx");
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
+
+        [HttpPut("{projectId}")]
+        public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
+        {
+            try
+            {
+                var project = await _updateProject.Execute(projectId, dto);
+                return Ok(project);
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+        }
+
+        [HttpDelete("{projectId}")]
+        public async Task<ActionResult> DeleteProject(Guid projectId)
+        {
+            try
+            {
+                var success = await _deleteProject.Execute(projectId);
+                return NoContent();
+            }
+            catch (ProjectNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+
+
+
 
 
 
