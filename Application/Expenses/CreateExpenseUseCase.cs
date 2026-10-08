@@ -48,7 +48,7 @@ namespace Application.Expenses
             return newExpense;
         }
 
-        private bool BudgetOverschreden(IEnumerable<Expense?> expenses, decimal amount, decimal? totalBudget, bool? force)
+        public static bool BudgetOverschreden(IEnumerable<Expense?> expenses, decimal amount, decimal? totalBudget, bool? force)
         {
             if (totalBudget == null) return false;
             if (force == true) return false;
