@@ -7,7 +7,6 @@
   </Project>
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" Id="b78e0185-93b4-45bb-b146-a2f96844d88b" />
-  <Project Path="Reno.Test/Reno.Test.csproj" Id="d81b88eb-d5b4-4436-80d6-5866a940fa39" />
   <Project Path="Reno/Reno.csproj">
     <BuildDependency Project="Application/Application.csproj" />
     <BuildDependency Project="Shared.DTO/Shared.csproj" />

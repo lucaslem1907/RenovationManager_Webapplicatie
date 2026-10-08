@@ -7,6 +7,7 @@ public class ProjectBuilder
     private string _name = "Test Project";
     private string _address = "Street 1";
     private string _description = "Project description";
+    private decimal _budget = 100;
     private User _owner = new UserBuilder().Build();
 
     public ProjectBuilder WithName(string name)
@@ -18,6 +19,12 @@ public class ProjectBuilder
     public ProjectBuilder WithAddress(string address)
     {
         _address = address;
+        return this;
+    }
+
+    public ProjectBuilder WithBudget(decimal budget)
+    {
+        _budget = budget;
         return this;
     }
 
@@ -35,6 +42,6 @@ public class ProjectBuilder
 
     public Project Build()
     {
-        return new Project(_name, _owner, _address, _description);
+        return new Project(_name, _owner, _address, _description, _budget);
     }
 }

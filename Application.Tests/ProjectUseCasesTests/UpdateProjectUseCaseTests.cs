@@ -1,12 +1,10 @@
-﻿using Application.Interfaces;
-using Shared.Builders.DtoBuilders;
-using Shared.Builders.EntityBuilders;
-using Application.Exceptions;
+﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Projects;
-using Shared.DTO;
 using Domain.Entities;
 using Moq;
-using Xunit;
+using Shared.Builders.DtoBuilders;
+using Shared.Builders.EntityBuilders;
 
 namespace Application.Tests.ProjectTestUseCases
 {
@@ -24,6 +22,7 @@ namespace Application.Tests.ProjectTestUseCases
             var project = new ProjectBuilder().WithOwner(user).Build();
 
             var ProjectDto = new ProjectDtoBuilder()
+                .WithOwnerId(user.Id)
                 .WithName("Aangepaste Naam")
                 .WithAddress("Aangepast Adres")
                 .WithDescription("toevoegen beschrijving")
@@ -32,7 +31,7 @@ namespace Application.Tests.ProjectTestUseCases
                 .Build();
 
             //Setup
-            mockProjectRepo.Setup(repo => repo.GetByIdWithDetails(project.Id)).ReturnsAsync(project);
+            mockProjectRepo.Setup(repo => repo.GetById(project.Id)).ReturnsAsync(project);
 
             //Act
             var result = await useCase.Execute(project.Id, ProjectDto);
@@ -63,7 +62,7 @@ namespace Application.Tests.ProjectTestUseCases
                 .WithDescription("toevoegen beschrijving")
                 .WithBudget(10000)
                 .WithStartDate(DateTime.Now)
-                .Build(); 
+                .Build();
             //setup
             mockProjectRepo.Setup(repo => repo.GetByIdWithDetails(It.IsAny<Guid>())).ReturnsAsync((Project?)null);
 

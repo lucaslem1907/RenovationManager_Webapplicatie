@@ -27,7 +27,7 @@ namespace Application.Projects
             }
             ;
 
-            var project = new Project(dto.Name, owner, dto.Address, dto.Description);
+            var project = new Project(dto.Name, owner, dto.Address, dto.Description, dto.Budget);
 
             await _repo.Add(project);
             await _repo.SaveChanges();

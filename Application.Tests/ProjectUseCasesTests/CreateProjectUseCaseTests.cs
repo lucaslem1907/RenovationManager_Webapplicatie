@@ -20,6 +20,7 @@ public class CreateProjectUseCaseTests
 
         var testUser = new UserBuilder().Build();
         var projectDto = new ProjectDtoBuilder()
+            .WithBudget(1000)
             .WithOwnerId(testUser.Id)
             .Build();
 
@@ -28,7 +29,8 @@ public class CreateProjectUseCaseTests
         var result = await useCase.Execute(projectDto);
 
         Assert.NotNull(result);
-        Assert.Equal("New Kitchen", result.Name);
+        Assert.Equal(projectDto.Name, result.Name);
+        Assert.Equal(projectDto.Budget, result.Budget);
 
         mockProjectRepo.Verify(r => r.Add(It.IsAny<Project>()), Times.Once);
         mockProjectRepo.Verify(r => r.SaveChanges(), Times.Once);

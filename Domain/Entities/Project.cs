@@ -21,13 +21,14 @@ public class Project
 
     private Project() { }
 
-    public Project(string name, User ownerId, string? address, string description = "")
+    public Project(string name, User ownerId, string? address, string description = "", decimal? budget = 0)
     {
         Id = Guid.NewGuid();
         Address = address;
         Name = name;
         Owner = ownerId;
         Description = description;
+        Budget = budget;
     }
 
     public void UpdateProject(string name, string description, string address, decimal? budget, DateTime startDate)
