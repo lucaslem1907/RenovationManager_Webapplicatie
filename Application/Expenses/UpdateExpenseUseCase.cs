@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -17,7 +18,10 @@ namespace Application.Expenses
         public async Task<Expense?> Execute(Guid expenseId, ExpenseDto dto)
         {
             var expense = await _repo.GetExpenseById(expenseId);
-            if (expense == null) { return null; }
+            if (expense == null)
+            {
+                throw new ExpenseNotFoundException(expenseId);
+            }
 
 
             expense.Name = dto.Name;

@@ -1,4 +1,5 @@
 ﻿using Application.Tasks;
+using Application.Exceptions;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,17 +57,25 @@ namespace Reno.Controllers
         [HttpPost("{roomId}/tasks/create")]
         public async Task<ActionResult> AddTask(Guid roomId, [FromBody] TaskDto dto)
         {
-            var newTask = await _createTask.Execute(roomId, dto);
-            if (newTask == null) return NotFound("Room niet gevonden.");
-
-            return CreatedAtAction(nameof(AddTask), new { roomId = roomId }, new
+            try
             {
-                Id = newTask.Id,
-                Title = newTask.Title,
-                Status = newTask.IsCompleted,
-                RoomStatus = newTask.Room.Status
-            });
+                var newTask = await _createTask.Execute(roomId, dto);
+                if (newTask == null) return NotFound("Room niet gevonden.");
+
+                return CreatedAtAction(nameof(AddTask), new { roomId = roomId }, new
+                {
+                    Id = newTask.Id,
+                    Title = newTask.Title,
+                    Status = newTask.IsCompleted,
+                    RoomStatus = newTask.Room.Status
+                });
+            }
+            catch (RoomNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+
 
         [HttpPut("{roomId}/tasks/{taskId}")]
         public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)

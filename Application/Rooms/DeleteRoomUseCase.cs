@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 
 namespace Application.Rooms
 {
@@ -17,17 +18,23 @@ namespace Application.Rooms
         public async Task<bool> Execute(Guid roomId, bool deleteExpenses)
         {
             var room = await _repo.GetRoomById(roomId);
-            if (room == null || room.Equals("[]")) { return false; }
+            if (room == null)
+            {
+                throw new RoomNotFoundException(roomId);
+            }
+
+            var roomExpenses = (await _expenserepo.GetExpensesByRoomId(roomId))
+                .ToList();
 
             if (deleteExpenses)
             {
                 // delete all expenses for this room
-                await _expenserepo.DeleteRange(room.Expenses);
+                await _expenserepo.DeleteRange(roomExpenses);
             }
             else
             {
                 // set roomId to null on expenses
-                foreach (var expense in room.Expenses)
+                foreach (var expense in roomExpenses)
                 {
                     expense.RoomId = null;
                 }

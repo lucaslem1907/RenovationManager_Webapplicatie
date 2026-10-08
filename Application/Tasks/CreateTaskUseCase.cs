@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 using Domain.Enums;
@@ -19,7 +20,10 @@ namespace Application.Tasks
         {
 
             var room = await _roomRepository.GetRoomById(roomId);
-            if (room == null) { return null; }
+            if (room == null) 
+            {
+             throw new RoomNotFoundException(roomId);
+            }
 
 
             TaskItem task = new TaskItem(dto.Title, roomId);

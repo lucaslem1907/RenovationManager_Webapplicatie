@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Application.Exceptions;
 
 namespace Application.Projects
 {
@@ -14,7 +15,12 @@ namespace Application.Projects
 
         public async Task<Project?> Execute(Guid id)
         {
-            return await _repo.GetByIdWithDetails(id);
+            var project = await _repo.GetByIdWithDetails(id);
+            if (project == null)
+            {
+                throw new ProjectNotFoundException(id);
+            }
+            return project;
         }
 
     }

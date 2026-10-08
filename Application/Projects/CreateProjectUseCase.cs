@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -17,8 +18,14 @@ namespace Application.Projects
 
         public async Task<Project?> Execute(ProjectDto dto)
         {
-            var owner = await _userRepo.GetById(dto.OwnerId);
-            if (owner == null) return null;
+            Guid ownerId = dto.OwnerId;
+            var owner = await _userRepo.GetById(ownerId);
+
+            if (owner == null)
+            {
+                throw new OwnerNotFoundException(ownerId);
+            }
+            ;
 
             var project = new Project(dto.Name, owner, dto.Address, dto.Description);
 

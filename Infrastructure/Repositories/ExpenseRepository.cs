@@ -41,6 +41,12 @@ namespace Infrastructure.Repositories
                 .Where(d => d.ProjectId == projectid).ToListAsync();
         }
 
+        public async Task<IEnumerable<Expense?>> GetExpensesByRoomId(Guid roomId)
+        {
+            return await _db.Expenses
+                .Where(d => d.RoomId == roomId).ToListAsync();
+        }
+
         public async Task SaveChanges()
         {
             await _db.SaveChangesAsync();

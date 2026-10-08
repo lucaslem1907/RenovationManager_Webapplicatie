@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -18,7 +19,11 @@ namespace Application.Rooms
         public async Task<Room?> Execute(Guid projectId, RoomDto dto)
         {
             var project = await _projectrepo.GetById(projectId);
-            if (project == null) { return null; }
+            if (project == null)
+            {
+                throw new ProjectNotFoundException(projectId);
+
+            }
 
             var newRoom = new Room
             {

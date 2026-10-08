@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 
 namespace Application.Expenses
 {
@@ -15,7 +16,7 @@ namespace Application.Expenses
         public async Task<bool> Execute(Guid expenseId)
         {
             var expense = await _repo.GetExpenseById(expenseId);
-            if (expense == null) { return false; }
+            if (expense == null) { throw new ExpenseNotFoundException(expenseId); }
             await _repo.Delete(expense);
             await _repo.SaveChanges();
             return true;
