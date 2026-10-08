@@ -25,6 +25,7 @@ namespace Application.Rooms
 
             room.Name = dto.Name;
             room.Status = dto.Status;
+            room.Note = dto.Note;
             await _repo.SaveChanges(); ;
             return room;
         }
