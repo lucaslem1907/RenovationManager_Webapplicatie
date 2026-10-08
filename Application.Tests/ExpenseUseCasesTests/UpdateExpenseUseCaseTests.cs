@@ -15,24 +15,30 @@ namespace Application.Tests.ExpenseUseCasesTests
         {
             //Arrange
             var mockExpenseRepo = new Mock<IExpenseRepository>();
-            var useCase = new UpdateExpenseUseCase(mockExpenseRepo.Object);
-            var user = new UserBuilder().Build();
-            var project = new ProjectBuilder().WithOwner(user).Build();
-            var expense = new ExpenseBuilder().WithProjectId(project.Id).Build();
+            var mockProjectRepo = new Mock<IProjectRepository>();
+            var useCase = new UpdateExpenseUseCase(mockExpenseRepo.Object, mockProjectRepo.Object);
+
+
+            var project = new ProjectBuilder().WithBudget(100).Build();
+            var expense = new ExpenseBuilder().WithProjectId(project.Id).WithAmount(30).Build();
 
             var expenseDto = new ExpenseDtoBuilder()
                 .WithName("Updated Expense")
-                .WithAmount(200)
+                .WithAmount(50)
                 .WithCreatedDate(DateTime.Now.Date)
                 .Build();
+
             //Setup
             mockExpenseRepo.Setup(repo => repo.GetExpenseById(expense.Id)).ReturnsAsync(expense);
+            mockProjectRepo.Setup(repo => repo.GetById(expense.ProjectId)).ReturnsAsync(project);
+            mockExpenseRepo.Setup(repo => repo.GetExpensesByProjectId(project.Id)).ReturnsAsync(new List<Expense?> { expense });
+            
             //Act
             var result = await useCase.Execute(expense.Id, expenseDto);
             //Assert
             Assert.NotNull(result);
             Assert.Equal("Updated Expense", result.Name);
-            Assert.Equal(200, result.Amount);
+            Assert.Equal(50, result.Amount);
             Assert.Equal(DateTime.Now.Date, result.CreatedDate);
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Once);
         }
@@ -42,7 +48,8 @@ namespace Application.Tests.ExpenseUseCasesTests
         {
             //Arrange
             var mockExpenseRepo = new Mock<IExpenseRepository>();
-            var useCase = new UpdateExpenseUseCase(mockExpenseRepo.Object);
+            var mockProjectRepo = new Mock<IProjectRepository>();
+            var useCase = new UpdateExpenseUseCase(mockExpenseRepo.Object, mockProjectRepo.Object);
 
             Guid expense = Guid.NewGuid();
             var expenseDto = new ExpenseDtoBuilder()
@@ -59,5 +66,35 @@ namespace Application.Tests.ExpenseUseCasesTests
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Never);
         }
 
+        [Fact]
+        public async Task NotExecute_WhenBudgetIsExceeded_ShouldThrowBudgetExceededException()
+        {
+            //Arrange
+            var mockExpenseRepo = new Mock<IExpenseRepository>();
+            var mockProjectRepo = new Mock<IProjectRepository>();
+            var useCase = new UpdateExpenseUseCase(mockExpenseRepo.Object, mockProjectRepo.Object);
+
+            var project = new ProjectBuilder().WithBudget(100).Build();
+            var expense = new ExpenseBuilder()
+                .WithProjectId(project.Id)
+                .WithAmount(50)
+                .Build();
+
+            var expenseDto = new ExpenseDtoBuilder()
+                .WithName("Updated Expense")
+                .WithAmount(200)
+                .WithCreatedDate(DateTime.Now)
+                .Build();
+
+            //Setup
+            mockExpenseRepo.Setup(repo => repo.GetExpenseById(expense.Id)).ReturnsAsync(expense);
+            mockProjectRepo.Setup(repo => repo.GetById(expense.ProjectId)).ReturnsAsync(project);
+            mockExpenseRepo.Setup(repo => repo.GetExpensesByProjectId(project.Id)).ReturnsAsync(new List<Expense> { expense });
+
+
+            //Act & Assert
+            await Assert.ThrowsAsync<BudgetExceededException>(() =>     useCase.Execute(expense.Id, expenseDto));
+            mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Never);
+        }
     }
 }
