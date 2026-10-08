@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 
 namespace Application.Subtaks
@@ -16,7 +17,10 @@ namespace Application.Subtaks
         public async Task<Subtask> GetSubTask(Guid subtaskId)
         {
             var subtask = await _repo.GetSubTask(subtaskId);
-            if (subtask == null) { return null; }
+            if (subtask == null)
+            {
+                throw new SubTaskNotFoundException(subtaskId);
+            }
             return subtask;
 
         }
@@ -26,14 +30,6 @@ namespace Application.Subtaks
             var subtasks = await _repo.GetAll();
             if (subtasks == null) { return null; }
             return subtasks;
-        }
-
-        public async Task<Subtask> getSubTask(Guid subtaskId)
-        {
-            var subtask = await _repo.GetSubTask(subtaskId);
-            if (subtask == null) return null;
-
-            return subtask;
         }
     }
 }

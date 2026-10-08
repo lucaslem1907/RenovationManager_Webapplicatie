@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -21,10 +22,12 @@ namespace Application.Subtaks
             var subtask = await _repo.GetSubTask(subtaskId);
             bool status = true;
 
-            if (subtask == null) { return null; }
+            if (subtask == null) { throw new SubTaskNotFoundException(subtaskId); }
 
             subtask.UpdateSubtask(dto.Title, dto.IsCompleted);
             var task = await _taskRepo.GetTask(subtask.TaskItemId);
+
+            if (task == null) { throw new TaskNotFoundException(subtask.TaskItemId); }
             var inCompletedTasks = task.Subtasks.Where(c => c.IsCompleted == false);
 
             if (inCompletedTasks.Count() == 0)
