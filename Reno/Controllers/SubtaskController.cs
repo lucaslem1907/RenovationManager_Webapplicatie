@@ -47,7 +47,7 @@ namespace Reno.Controllers
         [HttpGet("{subtaskId}")]
         public async Task<ActionResult<IEnumerable<TaskItem>>> getSubtask(Guid subtaskId)
         {
-            var subtask = await _getSubtask.getSubTask(subtaskId);
+            var subtask = await _getSubtask.GetSubTask(subtaskId);
             if (subtask == null) return NotFound("subtaak niet gevonden.");
             return Ok(subtask);
         }

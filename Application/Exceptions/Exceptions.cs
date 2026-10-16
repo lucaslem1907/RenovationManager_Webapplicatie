@@ -56,26 +56,32 @@ namespace Application.Exceptions
 
     public class TaskNotFoundException : BaseException
     {
-        public TaskNotFoundException(Guid taskId) : base("TASK_NOT_FOUND", $"Task not found for id {taskId}")
+        public TaskNotFoundException(Guid taskId) : base($"Task not found for id {taskId}")
         {
         }
     }
 
     public class SubTaskNotFoundException : BaseException
     {
-        public SubTaskNotFoundException(Guid subTaskId) : base("SUBTASK_NOT_FOUND", $"Subtask not found for id: {subTaskId}")
+        public SubTaskNotFoundException(Guid subTaskId) : base($"Subtask not found for id: {subTaskId}")
         { }
     }
 
-    public class NotFoundException : BaseException
+    public class ProjectNotFoundException : BaseException
     {
-        public ProjectNotFoundException(Guid projectId)
-            : base($"Project not found for id {projectId}")
+        public ProjectNotFoundException(Guid projectId) : base($"Project not found for id {projectId}")
         {
         }
     }
 
-    public class ExpenseNotFoundException : Exception
+    public class NotFoundException : BaseException
+    {
+        public NotFoundException() : base($"not found")
+        {
+        }
+    }
+
+    public class ExpenseNotFoundException : BaseException
     {
         public ExpenseNotFoundException(Guid expenseId)
             : base($"Expense not found for id {expenseId}")
@@ -83,7 +89,7 @@ namespace Application.Exceptions
         }
     }
 
-    public class RoomNotFoundException : Exception
+    public class RoomNotFoundException : BaseException
     {
         public RoomNotFoundException(Guid roomId)
             : base($"Room not found for id {roomId}")
@@ -91,7 +97,7 @@ namespace Application.Exceptions
         }
     }
 
-    public class OwnerNotFoundException : Exception
+    public class OwnerNotFoundException : BaseException
     {
         public OwnerNotFoundException(Guid ownerId)
             : base($"Owner not found for id {ownerId}")
@@ -104,6 +110,7 @@ namespace Application.Exceptions
         public BaseException(string message) : base(message)
         {
         }
+
     }
 }
 
