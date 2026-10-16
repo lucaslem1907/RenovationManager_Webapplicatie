@@ -31,7 +31,7 @@ namespace Application.Rooms
             var rooms = await _repo.GetAll();
             if (rooms == null)
             {
-                throw new NotFoundException("No rooms were found");
+                throw new RoomNotFoundException(Guid.Empty);
             }
             return rooms;
         }

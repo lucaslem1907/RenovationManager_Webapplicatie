@@ -123,7 +123,7 @@ namespace Reno.Controllers
         protected ActionResult HandleBaseException(BaseException ex)
 
         {
-            return StatusCode(ex.StatusCode, ex.Message);
+            return StatusCode(500, ex.Message);
         }
 
     }

@@ -36,10 +36,14 @@ namespace Application.Tests.ExpenseUseCasesTests
             //Act
             var result = await useCase.Execute(expense.Id, expenseDto);
             //Assert
-            Assert.NotNull(result);
-            Assert.Equal("Updated Expense", result.Name);
-            Assert.Equal(50, result.Amount);
-            Assert.Equal(DateTime.Now.Date, result.CreatedDate);
+            Assert.True(result.IsSuccess);
+            var UpdatedExpense = result.Value;
+
+            Assert.NotNull(UpdatedExpense);
+            Assert.Equal("Updated Expense", UpdatedExpense.Name);
+            Assert.Equal(50, UpdatedExpense.Amount);
+            Assert.Equal(DateTime.Now.Date, UpdatedExpense.CreatedDate);
+
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Once);
         }
 
@@ -62,7 +66,10 @@ namespace Application.Tests.ExpenseUseCasesTests
             mockExpenseRepo.Setup(repo => repo.GetExpenseById(expense)).ReturnsAsync((Expense?)null);
 
             //Act & Assert
-            await Assert.ThrowsAsync<ExpenseNotFoundException>(() => useCase.Execute(expense, expenseDto));
+            var result = await useCase.Execute(expense, expenseDto);
+
+            Assert.False(result.IsSuccess);
+            Assert.True(result.Errors.First() is ExpenseNotFoundError);
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Never);
         }
 
@@ -93,8 +100,12 @@ namespace Application.Tests.ExpenseUseCasesTests
 
 
             //Act & Assert
-            await Assert.ThrowsAsync<BudgetExceededException>(() =>     useCase.Execute(expense.Id, expenseDto));
+            var result = await useCase.Execute(expense.Id, expenseDto);
+
+            Assert.False(result.IsSuccess);
+            Assert.True(result.Errors.First() is BudgetExceededError);
+
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Never);
-        }
+        }   
     }
 }

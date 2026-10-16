@@ -1,67 +1,97 @@
 using Application.Exceptions;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Exceptions
 {
 
-    public abstract class BaseException : Exception
+    public sealed class ProjectNotFoundError : Error
     {
-        public string ErrorCode { get; }
-        public int StatusCode { get; }
-
-        protected BaseException(string errorCode, string message, int statusCode = 400) : base(message)
+        public ProjectNotFoundError(Guid projectId)
+            : base($"Project not found for id {projectId}")
         {
-            ErrorCode = errorCode;
-            StatusCode = statusCode;
+            Metadata["ErrorCode"] = "PROJECT_NOT_FOUND";
         }
     }
 
-    public class ProjectNotFoundException : BaseException
+    public class BudgetExceededError : Error
     {
-        public ProjectNotFoundException(Guid projectId) : base("PROJECT_NOT_FOUND", $"Project not found for id {projectId}", 404)
+        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = {Budget}")
+        {
+            Metadata["ErrorCode"] = "BUDGET_EXCEEDED";
+        }
+    }
+
+    public class OwnerNotFoundError : Error
+    {
+        public OwnerNotFoundError(Guid ownerId) : base($"Owner not found for id {ownerId}")
+        {
+            Metadata["ErrorCode"] = "OWNER_NOT_FOUND";
+        }
+    }
+
+    public class ExpenseNotFoundError : Error
+    {
+        public ExpenseNotFoundError(Guid expenseId) : base($"Expense not found for id {expenseId}")
+        {
+            Metadata["ErrorCode"] = "EXPENSE_NOT_FOUND";
+        }
+    }
+
+    public class RoomNotFoundError : Error
+    {
+        public RoomNotFoundError(Guid roomId) : base($"Room not found for id {roomId}")
+        {
+            Metadata["ErrorCode"] = "ROOM_NOT_FOUND";
+        }
+    }
+
+    public class NotFoundError : Error
+    {
+        public NotFoundError(string message) : base(message)
+        {
+            Metadata["ErrorCode"] = "NOT_FOUND";
+        }
+    }
+
+    public class ProjectNotFoundException : Exception
+    {
+        public ProjectNotFoundException(Guid projectId)
+            : base($"Project not found for id {projectId}")
         {
         }
     }
 
-    public class BudgetExceededException : BaseException
+    public class ExpenseNotFoundException : Exception
     {
-        public BudgetExceededException(decimal? Budget) : base("BUDGET_EXCEEDED", $"Budget exceeded, total budget = {Budget}", 409)
+        public ExpenseNotFoundException(Guid expenseId)
+            : base($"Expense not found for id {expenseId}")
         {
         }
     }
 
-    public class OwnerNotFoundException : BaseException
+    public class RoomNotFoundException : Exception
     {
-        public OwnerNotFoundException(Guid ownerId) : base("OWNER_NOT_FOUND", $"Owner not found for id {ownerId}", 404)
+        public RoomNotFoundException(Guid roomId)
+            : base($"Room not found for id {roomId}")
         {
         }
     }
 
-    public class ExpenseNotFoundException : BaseException
+    public class OwnerNotFoundException : Exception
     {
-        public ExpenseNotFoundException(Guid expenseId) : base("EXPENSE_NOT_FOUND", $"Expense not found for id {expenseId}", 404)
+        public OwnerNotFoundException(Guid ownerId)
+            : base($"Owner not found for id {ownerId}")
         {
         }
     }
 
-    public class RoomNotFoundException : BaseException
+    public class BaseException : Exception
     {
-        public RoomNotFoundException(Guid roomId) : base("ROOM_NOT_FOUND", $"Room not found for id {roomId}", 404)
+        public BaseException(string message) : base(message)
         {
         }
     }
+}
 
-    public class NotFoundException : BaseException
-    {
-        public NotFoundException(string message) : base("NOT_FOUND", message, 404)
-        {
-        }
-    }
-
-
-
-
-
-
-    }
 

@@ -3,6 +3,7 @@ using Application.Exceptions;
 using Application.Expenses;
 using Domain.Entities;
 using Shared.DTO;
+using FluentResults;
 
 namespace Application.Expenses
 {
@@ -18,21 +19,24 @@ namespace Application.Expenses
 
         }
 
-        public async Task<Expense?> Execute(Guid expenseId, ExpenseDto dto)
+        public async Task<Result<Expense?>> Execute(Guid expenseId, ExpenseDto dto)
         {
             var expense = await _repo.GetExpenseById(expenseId);
             if (expense == null)
             {
-                throw new ExpenseNotFoundException(expenseId);
+                return Result.Fail(new ExpenseNotFoundError(expenseId));
             }
+
             var project = await _projectRepo.GetById(expense.ProjectId);
             var projectExpenses = await _repo.GetExpensesByProjectId(project.Id);
 
-
-            bool budgetCheck = BudgetExceededWithUpdatedAmount(projectExpenses, expense.Amount, dto.Amount, project.Budget, dto.ForceBudget);
+            var sumExpenses = projectExpenses
+                .Where(e => e.Id != expenseId)
+                .Sum(e => e.Amount) + dto.Amount;
+            bool budgetCheck = Checks.BudgetCheck(sumExpenses, project.Budget, dto.ForceBudget);
             if (budgetCheck)
             {
-                throw new BudgetExceededException(project.Budget);
+                return Result.Fail(new BudgetExceededError(project.Budget));
             }
 
             expense.Name = dto.Name;
@@ -41,26 +45,10 @@ namespace Application.Expenses
             expense.Amount = dto.Amount;
             expense.Status = dto.Status;
             expense.CreatedDate = dto.CreatedDate;
-            await _repo.SaveChanges(); ;
+            await _repo.SaveChanges();
             return expense;
         }
 
-        public static bool BudgetExceededWithUpdatedAmount(IEnumerable<Expense?> expenses, decimal oldAmount, decimal newAmount, decimal? totalBudget, bool? force)
-        {
-            if (totalBudget == null) return false;
-            if (force == true) return false;
-
-            decimal currentBudget = 0;
-            foreach (var item in expenses)
-            {
-                currentBudget += item?.Amount ?? 0;
-
-            }
-            var newBudget = currentBudget - oldAmount + newAmount;
-
-            return newBudget > totalBudget;
-
-        }
     }
 
 

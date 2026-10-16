@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
 using Application.Exceptions;
+using FluentResults;
 
 namespace Reno.Controllers
 {
@@ -32,89 +33,63 @@ namespace Reno.Controllers
 
 
         [HttpPost("{projectId}/create")]
-        public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
+        public async Task<ActionResult<Expense?>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
         {
-            try
+
+            var expense = await _createExpense.Execute(projectId, dto);
+            if (expense.IsFailed)
             {
-                var expense = await _createExpense.Execute(projectId, dto);
-                return Ok(new
-                {
-                    expense.Name,
-                    expense.Amount,
-                    expense.Id,
-                    date = expense.CreatedDate,
-                    expense.Status
-                });
+                return BadRequest(expense.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+
+            return Ok(expense.Value);
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
+        public async Task<ActionResult<IEnumerable<Expense>?>> GetExpenses()
         {
-            try
+
+            var expenses = await _getExpense.GetAllExpenses();
+            if (expenses.IsFailed)
             {
-                var expenses = await _getExpense.GetAllExpenses();
-                return Ok(expenses);
+                return BadRequest(expenses.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Ok(expenses.Value);
         }
 
         [HttpGet("{projectId}")]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
+        public async Task<Result<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
         {
-            try
+            var expenses = await _getExpense.GetExpensesByProjectId(projectId);
+            if (expenses.IsFailed)
             {
-                var expenses = await _getExpense.GetExpensesByProjectId(projectId);
-                return Ok(expenses);
+                return Result.Fail<IEnumerable<Expense>>(expenses.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Result.Ok(expenses.Value);
         }
 
 
 
         [HttpPut("{expenseId}/update")]
-        public async Task<ActionResult> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
+        public async Task<Result<Expense>> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
         {
-            try
+            var expense = await _updateExpense.Execute(expenseId, dto);
+            if (expense.IsFailed)
             {
-                var expense = await _updateExpense.Execute(expenseId, dto);
-                return Ok(expense);
+                return Result.Fail<Expense>(expense.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Result.Ok(expense.Value);
         }
 
         [HttpDelete("{expenseId}/delete")]
-        public async Task<ActionResult> DeleteExpense(Guid expenseId)
+        public async Task<Result> DeleteExpense(Guid expenseId)
         {
-            try
+            var success = await _deleteExpense.Execute(expenseId);
+            if (success.IsFailed)
             {
-                var success = await _deleteExpense.Execute(expenseId);
-                return NoContent();
+                return Result.Fail(success.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Result.Ok();
         }
-
-        protected ActionResult HandleBaseException(BaseException ex)
-
-        {
-            return StatusCode(ex.StatusCode, ex.Message);
-        }
-
     }
 }
