@@ -35,12 +35,15 @@ namespace Reno.Controllers
         public async Task<ActionResult<Subtask>> CreateSubTask([FromBody] SubTaskDto dto, Guid TaskItemId)
         {
             var newSubtask = await _createSubtask.Execute(TaskItemId, dto);
-            if (newSubtask == null) { BadRequest("taak niet kunnen aanmaken"); }
+            if (newSubtask.IsFailed)
+            {
+                return BadRequest(newSubtask.Errors);
+            }
             return CreatedAtAction(nameof(CreateSubTask), new { taskItemId = TaskItemId }, new
             {
-                Id = newSubtask.Id,
-                Title = newSubtask.Title,
-                Status = newSubtask.IsCompleted
+                Id = newSubtask.Value.Id,
+                Title = newSubtask.Value.Title,
+                Status = newSubtask.Value.IsCompleted
             });
         }
 
@@ -48,27 +51,31 @@ namespace Reno.Controllers
         public async Task<ActionResult<IEnumerable<TaskItem>>> getSubtask(Guid subtaskId)
         {
             var subtask = await _getSubtask.GetSubTask(subtaskId);
-            if (subtask == null) return NotFound("subtaak niet gevonden.");
-            return Ok(subtask);
+            if (subtask.IsFailed)
+            {
+                return NotFound(subtask.Errors);
+            }
+            return Ok(subtask.Value);
         }
 
         [HttpPut("{subTaskId}")]
         public async Task<ActionResult<Subtask>> UpdateSubTask(SubTaskDto dto, Guid subTaskId)
         {
             var subtask = await _updateSubtask.Execute(subTaskId, dto);
-            if (subtask == null)
+            if (subtask.IsFailed)
             {
-                return BadRequest("No Subtask Found");
+                return BadRequest(subtask.Errors);
             }
 
-            return (Ok(subtask));
+            return Ok(subtask.Value );
         }
 
         [HttpDelete("{subtaskId}")]
         public async Task<ActionResult> DeleteSubTask(Guid subtaskId)
         {
             var subtask = await _deleteSubtask.Execute(subtaskId);
-            if (!subtask) return BadRequest("Verwijderen niet gelukt");
+            if (subtask.IsFailed)
+            { return BadRequest(subtask.Errors);}
             return Ok(new { message = "Verwijderen subtask gelukt" });
         }
     }

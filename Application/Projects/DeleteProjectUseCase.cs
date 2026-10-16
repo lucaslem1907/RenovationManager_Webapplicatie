@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
+using FluentResults;
 
 namespace Application.Projects
 {
@@ -13,16 +14,16 @@ namespace Application.Projects
             _repo = repo;
         }
 
-        public async Task<bool> Execute(Guid id)
+        public async Task<Result<bool>> Execute(Guid id)
         {
             var project = await _repo.GetById(id);
             if (project == null)
             {
-                throw new ProjectNotFoundException(id);
+                return Result.Fail(new ProjectNotFoundError(id));
             }
             await _repo.Delete(project);
             await _repo.SaveChanges();
-            return true;
+            return Result.Ok(true);
         }
     }
 }

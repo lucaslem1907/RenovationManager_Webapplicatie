@@ -1,6 +1,6 @@
 ﻿using Application.Tasks;
-using Application.Exceptions;
 using Domain.Entities;
+using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
@@ -33,47 +33,52 @@ namespace Reno.Controllers
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetTasks()
         {
             var tasks = await _getTask.GetAllTasks();
-            if (tasks == null) { return NotFound(); }
-            return Ok(tasks);
+            if (tasks.IsFailed)
+            {
+                return BadRequest(tasks.Errors);
+            }
+            return Ok(tasks.Value);
         }
 
         [HttpGet("{roomId}/tasks")]
         public async Task<ActionResult<IEnumerable<TaskItem>>> GetRoomTasks(Guid roomId)
         {
             var tasks = await _getTask.GetTasksByRoomId(roomId);
-            if (tasks == null) return NotFound("Room of taken niet gevonden.");
-            return Ok(tasks);
+            if (tasks.IsFailed)
+            {
+                return BadRequest(tasks.Errors);
+            }
+            return Ok(tasks.Value);
         }
 
         [HttpGet("{taskId}")]
         public async Task<ActionResult<TaskItem>> GetTask(Guid taskId)
         {
             var task = await _getTask.getTask(taskId);
-            if (task == null) { return NotFound("Taak niet gevonden"); }
-            return Ok(task);
+            if (task.IsFailed)
+            {
+                return BadRequest(task.Errors);
+            }
+            return Ok(task.Value);
         }
 
 
         [HttpPost("{roomId}/tasks/create")]
         public async Task<ActionResult> AddTask(Guid roomId, [FromBody] TaskDto dto)
         {
-            try
+            var newTask = await _createTask.Execute(roomId, dto);
+            if (newTask.IsFailed)
             {
-                var newTask = await _createTask.Execute(roomId, dto);
-                if (newTask == null) return NotFound("Room niet gevonden.");
+                return BadRequest(newTask.Errors);
+            }
 
-                return CreatedAtAction(nameof(AddTask), new { roomId = roomId }, new
-                {
-                    Id = newTask.Id,
-                    Title = newTask.Title,
-                    Status = newTask.IsCompleted,
-                    RoomStatus = newTask.Room.Status
-                });
-            }
-            catch (RoomNotFoundException ex)
+            return CreatedAtAction(nameof(AddTask), new { roomId = roomId }, new
             {
-                return NotFound(ex.Message);
-            }
+                Id = newTask.Value.Id,
+                Title = newTask.Value.Title,
+                Status = newTask.Value.IsCompleted,
+                RoomStatus = newTask.Value.Room.Status
+            });
         }
 
 
@@ -81,16 +86,21 @@ namespace Reno.Controllers
         public async Task<ActionResult> UpdateTask(Guid roomId, Guid taskId, [FromBody] TaskDto dto)
         {
             var task = await _updateTask.Execute(taskId, dto);
-            if (task == null) return NotFound("Task niet gevonden.");
-            return Ok(task);
+            if (task.IsFailed)
+            {
+                return BadRequest(task.Errors);
+            }
+            return Ok(task.Value);
         }
-
 
         [HttpDelete("{roomId}/tasks/{taskId}")]
         public async Task<ActionResult> DeleteTask(Guid roomId, Guid taskId)
         {
             var task = await _deleteTask.Execute(taskId);
-            if (task == null) return NotFound("Task niet gevonden.");
+            if (task.IsFailed)
+            {
+                return BadRequest(task.Errors);
+            }
             return Ok(new
             {
                 message = "De taak is verwijderd"

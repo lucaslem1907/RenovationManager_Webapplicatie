@@ -2,6 +2,7 @@
 using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
+using FluentResults;
 
 namespace Application.Projects
 {
@@ -14,16 +15,16 @@ namespace Application.Projects
             _repo = repo;
         }
 
-        public async Task<Project?> Execute(Guid projectId, ProjectDto dto)
+        public async Task<Result<Project>> Execute(Guid projectId, ProjectDto dto)
         {
             var project = await _repo.GetById(projectId);
             if (project == null)
             { 
-                throw new ProjectNotFoundException(projectId); 
+                return Result.Fail(new ProjectNotFoundError(projectId)); 
             }
             project.UpdateProject(dto.Name, dto.Description, dto.Address, dto.Budget, dto.StartDate);
             await _repo.SaveChanges();
-            return project;
+            return Result.Ok(project);
 
         }
     }

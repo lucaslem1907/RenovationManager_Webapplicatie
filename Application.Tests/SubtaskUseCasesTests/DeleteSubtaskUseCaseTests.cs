@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Application.Exceptions;
 using Application.Subtaks;
 using Domain.Entities;
 using Moq;
@@ -20,13 +19,14 @@ namespace Application.Tests.SubtaskUseCasesTests
 
             var result = await useCase.Execute(subtask.Id);
 
-            Assert.True(result);
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
             mockSubtaskRepo.Verify(repo => repo.Delete(subtask), Times.Once);
             mockSubtaskRepo.Verify(repo => repo.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task Execute_WhenSubtaskMissing_ShouldThrowSubTaskNotFoundException()
+        public async Task Execute_WhenSubtaskMissing_ShouldReturnFailedResult()
         {
             var mockSubtaskRepo = new Mock<ISubtaskRepository>();
             var useCase = new DeleteSubtaskUseCase(mockSubtaskRepo.Object);
@@ -34,7 +34,8 @@ namespace Application.Tests.SubtaskUseCasesTests
 
             mockSubtaskRepo.Setup(repo => repo.GetSubTask(subtaskId)).ReturnsAsync((Subtask?)null);
 
-            await Assert.ThrowsAsync<SubTaskNotFoundException>(() => useCase.Execute(subtaskId));
+            var result = await useCase.Execute(subtaskId);
+            Assert.True(result.IsFailed);
 
             mockSubtaskRepo.Verify(repo => repo.Delete(It.IsAny<Subtask>()), Times.Never);
             mockSubtaskRepo.Verify(repo => repo.SaveChanges(), Times.Never);

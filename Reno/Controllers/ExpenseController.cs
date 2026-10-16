@@ -1,6 +1,5 @@
 ﻿using Application.Expenses;
 using Domain.Entities;
-using FluentResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
@@ -57,38 +56,38 @@ namespace Reno.Controllers
         }
 
         [HttpGet("{projectId}")]
-        public async Task<Result<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
+        public async Task<ActionResult<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
         {
             var expenses = await _getExpense.GetExpensesByProjectId(projectId);
             if (expenses.IsFailed)
             {
-                return Result.Fail<IEnumerable<Expense>>(expenses.Errors);
+                return NotFound(expenses.Errors);
             }
-            return Result.Ok(expenses.Value);
+            return Ok(expenses.Value);
         }
 
 
 
         [HttpPut("{expenseId}/update")]
-        public async Task<Result<Expense>> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
+        public async Task<ActionResult<Expense>> UpdateExpense(Guid expenseId, [FromBody] ExpenseDto dto)
         {
             var expense = await _updateExpense.Execute(expenseId, dto);
             if (expense.IsFailed)
             {
-                return Result.Fail<Expense>(expense.Errors);
+                return BadRequest(expense.Errors);
             }
-            return Result.Ok(expense.Value);
+            return Ok(expense.Value);
         }
 
         [HttpDelete("{expenseId}/delete")]
-        public async Task<Result> DeleteExpense(Guid expenseId)
+        public async Task<ActionResult> DeleteExpense(Guid expenseId)
         {
             var success = await _deleteExpense.Execute(expenseId);
             if (success.IsFailed)
             {
-                return Result.Fail(success.Errors);
+                return NotFound(success.Errors);
             }
-            return Result.Ok();
+            return Ok();
         }
     }
 }

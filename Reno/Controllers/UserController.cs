@@ -19,8 +19,11 @@ namespace Reno.Controllers
         public async Task<ActionResult<IEnumerable<Project>>> GetUserProjects(Guid userId)
         {
             var userProjects = await _GetUserProjects.Execute(userId);
-            if (userProjects == null) { return BadRequest("geen projecten voor deze user"); }
-            return Ok(userProjects);
+            if (userProjects.IsFailed)
+            {
+                return NotFound(userProjects.Errors);
+            }
+            return Ok(userProjects.Value);
         }
 
 

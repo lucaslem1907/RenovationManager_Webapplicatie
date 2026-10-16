@@ -1,6 +1,4 @@
-using Application.Exceptions;
 using FluentResults;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Exceptions
 {
@@ -51,6 +49,46 @@ namespace Application.Exceptions
         public NotFoundError(string message) : base(message)
         {
             Metadata["ErrorCode"] = "NOT_FOUND";
+        }
+    }
+
+    public class TaskNotFoundError : Error
+    {
+        public TaskNotFoundError(Guid taskId) : base($"Task not found for id {taskId}")
+        {
+            Metadata["ErrorCode"] = "TASK_NOT_FOUND";
+        }
+    }
+
+    public class SubTaskNotFoundError : Error
+    {
+        public SubTaskNotFoundError(Guid subTaskId) : base($"Subtask not found for id: {subTaskId}")
+        {
+            Metadata["ErrorCode"] = "SUBTASK_NOT_FOUND";
+        }
+    }
+
+    public class DuplicateEmailError : Error
+    {
+        public DuplicateEmailError(string email) : base($"A user already exists with email {email}")
+        {
+            Metadata["ErrorCode"] = "DUPLICATE_EMAIL";
+        }
+    }
+
+    public class InvalidCredentialsError : Error
+    {
+        public InvalidCredentialsError() : base("Invalid login or password")
+        {
+            Metadata["ErrorCode"] = "INVALID_CREDENTIALS";
+        }
+    }
+
+    public class UserProjectsNotFoundError : Error
+    {
+        public UserProjectsNotFoundError(Guid userId) : base($"No projects found for user id {userId}")
+        {
+            Metadata["ErrorCode"] = "USER_PROJECTS_NOT_FOUND";
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
+using FluentResults;
 
 namespace Application.Rooms
 {
@@ -15,12 +16,12 @@ namespace Application.Rooms
 
         }
 
-        public async Task<bool> Execute(Guid roomId, bool deleteExpenses)
+        public async Task<Result<bool>> Execute(Guid roomId, bool deleteExpenses)
         {
             var room = await _repo.GetRoomById(roomId);
             if (room == null)
             {
-                throw new RoomNotFoundException(roomId);
+                return Result.Fail(new RoomNotFoundError(roomId));
             }
 
             var roomExpenses = (await _expenserepo.GetExpensesByRoomId(roomId))
@@ -41,7 +42,7 @@ namespace Application.Rooms
             }
             await _repo.Delete(room);
             await _repo.SaveChanges();
-            return true;
+            return Result.Ok(true);
         }
     }
 }

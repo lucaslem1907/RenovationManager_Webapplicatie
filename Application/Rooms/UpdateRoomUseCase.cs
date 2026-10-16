@@ -2,6 +2,7 @@
 using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
+using FluentResults;
 
 namespace Application.Rooms
 {
@@ -15,19 +16,19 @@ namespace Application.Rooms
 
         }
 
-        public async Task<Room?> Execute(Guid roomId, RoomDto dto)
+        public async Task<Result<Room>> Execute(Guid roomId, RoomDto dto)
         {
             var room = await _repo.GetRoomById(roomId);
             if (room == null)
             { 
-                throw new RoomNotFoundException(roomId);
+                return Result.Fail(new RoomNotFoundError(roomId));
             }
 
             room.Name = dto.Name;
             room.Status = dto.Status;
             room.Note = dto.Note;
             await _repo.SaveChanges(); ;
-            return room;
+            return Result.Ok(room);
         }
     }
 

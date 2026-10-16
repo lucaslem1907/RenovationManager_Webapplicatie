@@ -5,7 +5,6 @@ using Domain.Enums;
 using Shared.Builders.EntityBuilders;
 using Shared.Builders.DtoBuilders;
 using Application.Rooms;
-using Application.Exceptions;
 
 namespace Application.Tests.RoomUseCasesTests
 {
@@ -35,16 +34,16 @@ namespace Application.Tests.RoomUseCasesTests
             // Act
             var result = await useCase.Execute(project.Id, roomDto);
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal("Living Room", result.Name);
-            Assert.Equal(RoomStatus.not_started, result.Status);
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Living Room", result.Value.Name);
+            Assert.Equal(RoomStatus.not_started, result.Value.Status);
 
             mockRoomRepo.Verify(r => r.Add(It.IsAny<Room>()), Times.Once);
             mockRoomRepo.Verify(r => r.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task Execute_WhenProjectIsNull_ShouldReturnException()
+        public async Task Execute_WhenProjectIsNull_ShouldReturnFailedResult()
         {
             // Arrange
             var mockRoomRepo = new Mock<IRoomRepository>();
@@ -60,7 +59,8 @@ namespace Application.Tests.RoomUseCasesTests
             mockProjectRepo.Setup(r => r.GetById(projectId)).ReturnsAsync((Project?)null);
             
             // Act
-            await Assert.ThrowsAsync<ProjectNotFoundException>(() => useCase.Execute(projectId, roomDto));
+            var result = await useCase.Execute(projectId, roomDto);
+            Assert.True(result.IsFailed);
             
             // Assert
             mockRoomRepo.Verify(r => r.Add(It.IsAny<Room>()), Times.Never);

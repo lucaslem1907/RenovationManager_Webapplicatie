@@ -5,6 +5,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
+using FluentResults;
 
 namespace Reno.Controllers
 {
@@ -37,83 +38,58 @@ namespace Reno.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Project>> CreateProject([FromBody] ProjectDto dto)
         {
-            try
+            var project = await _createProject.Execute(dto);
+            if (project.IsFailed)
             {
-                var result = await _createProject.Execute(dto);
-                return Ok(result);
+                return BadRequest(project.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Ok(project.Value);
         }
 
 
         [HttpGet("{projectId}")]
         public async Task<ActionResult<Project>> GetProject(Guid projectId)
         {
-            try
+            var project = await _getProject.Execute(projectId);
+            if (project.IsFailed)
             {
-                var project = await _getProject.Execute(projectId);
-                return Ok(project);
+                return NotFound(project.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Ok(project.Value);
         }
 
         [HttpGet("{projectId}/GenerateExcel")]
         public async Task<IActionResult> GenerateProjectExport(Guid projectId)
         {
-            try
-            {
-                var file = await _generateExcelProject.GenerateExcel(projectId);
-                return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            var file = await _generateExcelProject.GenerateExcel(projectId);
+            return File(file.Value, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         $"project-{projectId}.xlsx");
-            }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
         }
 
 
         [HttpPut("{projectId}")]
-        public async Task<ActionResult> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
+        public async Task<Result<Project>> UpdateProject(Guid projectId, [FromBody] ProjectDto dto)
         {
-            try
+            var project = await _updateProject.Execute(projectId, dto);
+            if (project.IsFailed)
             {
-                var project = await _updateProject.Execute(projectId, dto);
-                return Ok(project);
+                return Result.Fail(project.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
-
+            return Result.Ok(project.Value);
         }
 
         [HttpDelete("{projectId}")]
-        public async Task<ActionResult> DeleteProject(Guid projectId)
+        public async Task<Result> DeleteProject(Guid projectId)
         {
-            try
+            var success = await _deleteProject.Execute(projectId);
+            if (success.IsFailed)
             {
-                var success = await _deleteProject.Execute(projectId);
-                return NoContent();
+                return Result.Fail(success.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
+            return Result.Ok();
+           
+
         }
-
-        protected ActionResult HandleBaseException(BaseException ex)
-
-        {
-            return StatusCode(500, ex.Message);
-        }
-
     }
 }
 

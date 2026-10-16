@@ -5,6 +5,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
+using FluentResults;
 
 
 
@@ -36,95 +37,71 @@ namespace Reno.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
         {
-            try
-            {
-                var rooms = await _getRoom.GetAllRooms();
-                return Ok(rooms);
-            }
-            catch (BaseException ex)
-            {
 
-                return HandleBaseException(ex);
+            var rooms = await _getRoom.GetAllRooms();
+            if (rooms.IsFailed)
+            {
+                return NotFound(rooms.Errors);
             }
-            
+            return Ok(rooms.Value);
+
+
         }
 
         [HttpGet("{roomid}")]
         public async Task<ActionResult<IEnumerable<Room>>> GetRoomWithId(Guid roomid)
         {
-            try
+            var room = await _getRoom.GetRoomWithTaskAndSubTasks(roomid);
+            if (room.IsFailed)
             {
-                var room = await _getRoom.GetRoomWithTaskAndSubTasks(roomid);
-                return Ok(room);
+                return NotFound(room.Errors);
             }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
-            
-                        
+            return Ok(room.Value);
+
         }
 
         [HttpPost("{projectId}/room/create")]
         public async Task<ActionResult> AddRoom(Guid projectId, [FromBody] RoomDto dto)
         {
 
-            try
+            var newRoom = await _createRoom.Execute(projectId, dto);
+            if (newRoom.IsFailed)
             {
-                var newRoom = await _createRoom.Execute(projectId, dto);
-                return CreatedAtAction(nameof(AddRoom), new { projectId = projectId }, new
-                {
-                    Id = newRoom.Id,
-                    Name = newRoom.Name,
-                    Note = newRoom.Note,
-                    Status = newRoom.Status
-                });
+                return BadRequest(newRoom.Errors);
             }
-            catch (BaseException ex)
+            return CreatedAtAction(nameof(AddRoom), new { projectId = projectId }, new
             {
+                Id = newRoom.Value.Id,
+                Name = newRoom.Value.Name,
+                Note = newRoom.Value.Note,
+                Status = newRoom.Value.Status
+            });
 
-               return HandleBaseException(ex);
-            }
         }
 
         [HttpPut("{roomId}")]
         public async Task<ActionResult> UpdateRoom(Guid roomId, [FromBody] RoomDto dto)
         {
 
-            try
+            var room = await _updateRoom.Execute(roomId, dto);
+            if (room.IsFailed)
             {
-                var room = await _updateRoom.Execute(roomId, dto);
-                return Ok(room);
+                return BadRequest(room.Errors);
             }
-            catch (BaseException ex)
-            {
-
-                return HandleBaseException(ex);
-            }
-            
-            
-            
+            return Ok(room.Value);
         }
 
         [HttpDelete("{roomId}")]
         public async Task<ActionResult> DeleteRoom(Guid roomId, [FromQuery] bool deleteExpenses)
         {
-            try
-            {
-                var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
-                return Ok(new { message = "Room has been deleted" });
-            }
-            catch (BaseException ex)
-            {
-                return HandleBaseException(ex);
-            }
-            
-        }
 
-        protected ActionResult HandleBaseException(BaseException ex)
+            var succes = await _deleteRoom.Execute(roomId, deleteExpenses);
+            if (succes.IsFailed)
+            {
+                return BadRequest(succes.Errors);
+            }
+            return Ok(new { message = "Room has been deleted" });
 
-        {
-            return StatusCode(500, ex.Message);
         }
 
     }

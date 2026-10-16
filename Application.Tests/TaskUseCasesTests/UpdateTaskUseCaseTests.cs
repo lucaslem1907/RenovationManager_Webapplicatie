@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Application.Tasks;
-using Application.Exceptions;
 using Domain.Entities;
 using Domain.Enums;
 using Moq;
@@ -12,7 +11,7 @@ namespace Application.Tests.TaskUseCasesTests
     public class UpdateTaskUseCaseTests
     {
         [Fact]
-        public async Task Execute_WhenTaskDoesNotExist_ShouldThrowTaskNotFoundException()
+        public async Task Execute_WhenTaskDoesNotExist_ShouldReturnFailedResult()
         {
             var mockTaskRepo = new Mock<ITaskRepository>();
             var mockRoomRepo = new Mock<IRoomRepository>();
@@ -22,7 +21,8 @@ namespace Application.Tests.TaskUseCasesTests
 
             mockTaskRepo.Setup(repo => repo.GetTask(taskId)).ReturnsAsync((TaskItem?)null);
 
-            await Assert.ThrowsAsync<TaskNotFoundException>(() => useCase.Execute(taskId, dto));
+            var result = await useCase.Execute(taskId, dto);
+            Assert.True(result.IsFailed);
 
             mockTaskRepo.Verify(repo => repo.SaveChanges(), Times.Never);
         }
@@ -49,8 +49,8 @@ namespace Application.Tests.TaskUseCasesTests
 
             var result = await useCase.Execute(task.Id, dto);
 
-            Assert.NotNull(result);
-            Assert.True(result.IsCompleted);
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value.IsCompleted);
             Assert.Equal(RoomStatus.done, room.Status);
             mockTaskRepo.Verify(repo => repo.SaveChanges(), Times.Once);
         }
@@ -79,7 +79,7 @@ namespace Application.Tests.TaskUseCasesTests
 
             var result = await useCase.Execute(taskToUpdate.Id, dto);
 
-            Assert.NotNull(result);
+            Assert.True(result.IsSuccess);
             Assert.Equal(RoomStatus.in_progress, room.Status);
             mockTaskRepo.Verify(repo => repo.SaveChanges(), Times.Once);
         }

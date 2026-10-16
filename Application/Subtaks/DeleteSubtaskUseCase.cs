@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
+using FluentResults;
 
 namespace Application.Subtaks
 {
@@ -11,17 +12,17 @@ namespace Application.Subtaks
             _repo = repo;
         }
 
-        public async Task<bool> Execute(Guid subtaskId)
+        public async Task<Result<bool>> Execute(Guid subtaskId)
         {
             var subtask = await _repo.GetSubTask(subtaskId);
             if (subtask == null)
             {
-                throw new SubTaskNotFoundException(subtaskId);
+                return Result.Fail(new SubTaskNotFoundError(subtaskId));
             }
 
             await _repo.Delete(subtask);
             await _repo.SaveChanges();
-            return true;
+            return Result.Ok(true);
 
         }
     }
