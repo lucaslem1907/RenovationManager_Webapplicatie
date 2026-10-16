@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Application.Exceptions;
 
 namespace Application.Expenses
 {
@@ -16,7 +17,8 @@ namespace Application.Expenses
         public async Task<IEnumerable<Expense>> GetExpensesByProjectId(Guid projectId)
         {
             var expenses = await _repo.GetExpensesByProjectId(projectId);
-            if (expenses == null) { return null; }
+            if (expenses == null)
+            { throw new ProjectNotFoundException(projectId); }
 
             return expenses;
 
@@ -25,7 +27,6 @@ namespace Application.Expenses
         public async Task<IEnumerable<Expense>> GetAllExpenses()
         {
             var expenses = await _repo.GetAll();
-            if (expenses == null) { return null; }
             return expenses;
         }
     }

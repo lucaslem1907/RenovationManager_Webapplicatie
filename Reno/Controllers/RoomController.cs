@@ -44,7 +44,7 @@ namespace Reno.Controllers
             catch (BaseException ex)
             {
 
-                return NotFound(new {ex.ErrorCode, ex.Message});
+                return HandleBaseException(ex);
             }
             
         }
@@ -59,7 +59,7 @@ namespace Reno.Controllers
             }
             catch (BaseException ex)
             {
-                return NotFound(new {ex.ErrorCode, ex.Message});
+                return HandleBaseException(ex);
             }
             
                         
@@ -83,7 +83,7 @@ namespace Reno.Controllers
             catch (BaseException ex)
             {
 
-               return NotFound(new {ex.ErrorCode, ex.Message});
+               return HandleBaseException(ex);
             }
         }
 
@@ -99,7 +99,7 @@ namespace Reno.Controllers
             catch (BaseException ex)
             {
 
-                return NotFound(new {ex.ErrorCode, ex.Message});
+                return HandleBaseException(ex);
             }
             
             
@@ -116,9 +116,16 @@ namespace Reno.Controllers
             }
             catch (BaseException ex)
             {
-                return BadRequest(new {ex.ErrorCode, ex.Message});
+                return HandleBaseException(ex);
             }
             
         }
+
+        protected ActionResult HandleBaseException(BaseException ex)
+
+        {
+            return StatusCode(ex.StatusCode, ex.Message);
+        }
+
     }
 }

@@ -30,6 +30,7 @@ namespace Reno.Controllers
             _deleteExpense = deleteExpense;
         }
 
+
         [HttpPost("{projectId}/create")]
         public async Task<ActionResult<Expense>> CreateExpense(Guid projectId, [FromBody] ExpenseDto dto)
         {
@@ -45,40 +46,38 @@ namespace Reno.Controllers
                     expense.Status
                 });
             }
-            catch (ProjectNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
-            }
-            catch (BudgetExceededException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (RoomNotFoundException ex)
-            {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
-
-
-
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
         {
-
-            var expenses = await _getExpense.GetAllExpenses();
-            if (expenses == null) { return NotFound(); }
-
-            return Ok(expenses);
+            try
+            {
+                var expenses = await _getExpense.GetAllExpenses();
+                return Ok(expenses);
+            }
+            catch (BaseException ex)
+            {
+                return HandleBaseException(ex);
+            }
         }
 
         [HttpGet("{projectId}")]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpensesOfProject(Guid projectId)
         {
-            var expenses = await _getExpense.GetExpensesByProjectId(projectId);
-            if (expenses == null) { return NotFound(); }
-
-            return Ok(expenses);
+            try
+            {
+                var expenses = await _getExpense.GetExpensesByProjectId(projectId);
+                return Ok(expenses);
+            }
+            catch (BaseException ex)
+            {
+                return HandleBaseException(ex);
+            }
         }
 
 
@@ -89,12 +88,11 @@ namespace Reno.Controllers
             try
             {
                 var expense = await _updateExpense.Execute(expenseId, dto);
-                if (expense == null) { return NotFound(); }
                 return Ok(expense);
             }
-            catch (ExpenseNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
 
@@ -104,13 +102,19 @@ namespace Reno.Controllers
             try
             {
                 var success = await _deleteExpense.Execute(expenseId);
-                if (!success) return NotFound("Expense niet kunnen verwijderen.");
                 return NoContent();
             }
-            catch (ExpenseNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
+
+        protected ActionResult HandleBaseException(BaseException ex)
+
+        {
+            return StatusCode(ex.StatusCode, ex.Message);
+        }
+
     }
 }

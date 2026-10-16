@@ -42,9 +42,9 @@ namespace Reno.Controllers
                 var result = await _createProject.Execute(dto);
                 return Ok(result);
             }
-            catch (OwnerNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
 
@@ -57,9 +57,9 @@ namespace Reno.Controllers
                 var project = await _getProject.Execute(projectId);
                 return Ok(project);
             }
-            catch (ProjectNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
 
@@ -72,9 +72,9 @@ namespace Reno.Controllers
                 return File(file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         $"project-{projectId}.xlsx");
             }
-            catch (ProjectNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
 
@@ -87,9 +87,9 @@ namespace Reno.Controllers
                 var project = await _updateProject.Execute(projectId, dto);
                 return Ok(project);
             }
-            catch (ProjectNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
 
         }
@@ -102,18 +102,17 @@ namespace Reno.Controllers
                 var success = await _deleteProject.Execute(projectId);
                 return NoContent();
             }
-            catch (ProjectNotFoundException ex)
+            catch (BaseException ex)
             {
-                return NotFound(ex.Message);
+                return HandleBaseException(ex);
             }
         }
 
+        protected ActionResult HandleBaseException(BaseException ex)
 
-
-
-
-
-
+        {
+            return StatusCode(ex.StatusCode, ex.Message);
+        }
 
     }
 }
