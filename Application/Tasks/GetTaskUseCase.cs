@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 
 namespace Application.Tasks
@@ -18,9 +19,15 @@ namespace Application.Tasks
         public async Task<IEnumerable<TaskItem>> GetTasksByRoomId(Guid roomId)
         {
             var room = await _roomrepo.GetRoomById(roomId);
-            if (room == null) return null;
+            if (room == null)
+            { 
+                throw new RoomNotFoundException(roomId);
+            }
             var tasks = await _repo.GetTasksByRoomId(roomId);
-            if (tasks == null) { return null; }
+            if (tasks == null)
+            {
+                return null;
+            }
 
             return tasks;
 
@@ -36,14 +43,20 @@ namespace Application.Tasks
         public async Task<TaskItem> getTask(Guid taskId)
         {
             var task = await _repo.GetTask(taskId);
-            if (task == null) return null;
+            if (task == null)
+            {
+                throw new TaskNotFoundException(taskId);
+            }
 
             return task;
         }
         public async Task<TaskItem> getTaskWithSubtasks(Guid taskId)
         {
             var task = await _repo.GetTask(taskId);
-            if (task == null) return null;
+            if (task == null) 
+            {
+                throw new TaskNotFoundException(taskId);
+            }
 
             return task;
         }

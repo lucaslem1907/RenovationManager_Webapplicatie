@@ -7,6 +7,8 @@ public class Room
     public Guid Id { get; set; }
     public string Name { get; set; }
 
+    public string Note { get; set; } 
+
     public RoomStatus Status { get; set; }
 
     public Guid ProjectId { get; set; }
@@ -20,11 +22,12 @@ public class Room
 
     public Room() { }
 
-    public Room(string name, RoomStatus status)
+    public Room(string name, RoomStatus status, string note = "")
     {
         Id = Guid.NewGuid();
         Name = name;
         Status = status;
+        Note = note;
     }
 
     public void MarkCompleted()

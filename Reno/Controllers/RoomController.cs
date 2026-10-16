@@ -76,6 +76,7 @@ namespace Reno.Controllers
                 {
                     Id = newRoom.Id,
                     Name = newRoom.Name,
+                    Note = newRoom.Note,
                     Status = newRoom.Status
                 });
             }

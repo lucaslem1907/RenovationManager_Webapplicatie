@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 
 namespace Application.Subtaks
 {
@@ -13,7 +14,10 @@ namespace Application.Subtaks
         public async Task<bool> Execute(Guid subtaskId)
         {
             var subtask = await _repo.GetSubTask(subtaskId);
-            if (subtask == null) { return false; }
+            if (subtask == null)
+            {
+                throw new SubTaskNotFoundException(subtaskId);
+            }
 
             await _repo.Delete(subtask);
             await _repo.SaveChanges();

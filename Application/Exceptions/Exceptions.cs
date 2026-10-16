@@ -54,7 +54,20 @@ namespace Application.Exceptions
         }
     }
 
-    public class ProjectNotFoundException : Exception
+    public class TaskNotFoundException : BaseException
+    {
+        public TaskNotFoundException(Guid taskId) : base("TASK_NOT_FOUND", $"Task not found for id {taskId}")
+        {
+        }
+    }
+
+    public class SubTaskNotFoundException : BaseException
+    {
+        public SubTaskNotFoundException(Guid subTaskId) : base("SUBTASK_NOT_FOUND", $"Subtask not found for id: {subTaskId}")
+        { }
+    }
+
+    public class NotFoundException : BaseException
     {
         public ProjectNotFoundException(Guid projectId)
             : base($"Project not found for id {projectId}")

@@ -29,6 +29,7 @@ namespace Application.Rooms
             {
                 Name = dto.Name,
                 Status = dto.Status,
+                Note = dto.Note,
                 ProjectId = projectId
             };
 

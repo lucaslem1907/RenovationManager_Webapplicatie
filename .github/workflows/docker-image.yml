@@ -1,0 +1,33 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check code
+      - uses: actions/checkout@v4
+      # Setup
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0'
+      # Restore dependencies
+      - name: restore dependencies
+        run: dotnet restore
+      # Test-fase
+      - name: run dotnet tests
+        run: dotnet test --no-restore
+      # Build
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+
+        
+      
