@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 using Domain.Enums;
@@ -20,11 +21,19 @@ namespace Application.Tasks
         public async Task<TaskItem> Execute(Guid taskId, TaskDto dto)
         {
             var task = await _repo.GetTask(taskId);
-            if (task == null) { return null; }
+            if (task == null)
+            {
+                throw new TaskNotFoundException(taskId);
+            }
 
             task.UpdateTask(dto.Title, dto.Description, dto.IsCompleted);
 
             var room = await _roomRepo.GetRoomWithTaskAndSubTasks(task.RoomId);
+            if (room == null)
+            {
+                throw new RoomNotFoundException(task.RoomId);
+            }
+            
             var IncompletedTasks = room.Tasks.Where(i => !i.IsCompleted);
 
             if (!IncompletedTasks.Any())

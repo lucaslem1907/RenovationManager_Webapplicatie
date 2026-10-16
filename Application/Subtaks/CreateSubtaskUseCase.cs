@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 
@@ -17,7 +18,10 @@ namespace Application.Tasks
         public async Task<Subtask> Execute(Guid taskId, SubTaskDto dto)
         {
             var Task = await _taskRepository.GetTask(taskId);
-            if (Task == null) { return null; }
+            if (Task == null)
+            {
+                throw new TaskNotFoundException(taskId);
+            }
 
             Subtask subtask = new Subtask(dto.Title, taskId, dto.IsCompleted);
             await _repo.Add(subtask);
