@@ -19,8 +19,8 @@ namespace Application.Tests.ExpenseUseCasesTests
             var createExpenseUseCase = new CreateExpenseUseCase(mockExpenseRepository.Object, mockProjectRepository.Object, mockRoomRepository.Object);
 
 
-            var project = new ProjectBuilder().Build();
-            var room = new RoomBuilder().Build();
+            var project = new ProjectBuilder().WithBudget(1000).Build();
+            var room = new RoomBuilder().WithProjectId(project.Id).Build();
 
             var expenseDto = new ExpenseDtoBuilder()
                 .WithRoomId(room.Id)
@@ -79,8 +79,8 @@ namespace Application.Tests.ExpenseUseCasesTests
             var mockRoomRepository = new Mock<IRoomRepository>();
             var createExpenseUseCase = new CreateExpenseUseCase(mockExpenseRepository.Object, mockProjectRepository.Object, mockRoomRepository.Object);
 
-            var room = new RoomBuilder().Build();
             var project = new ProjectBuilder().WithBudget(100).Build();
+            var room = new RoomBuilder().WithProjectId(project.Id).Build();
             var expenseDto = new ExpenseDtoBuilder().WithAmount(200).WithRoomId(room.Id).WithForceBudget(true).Build();
             //Setup 
             mockProjectRepository.Setup(repo => repo.GetById(project.Id)).ReturnsAsync(project);
