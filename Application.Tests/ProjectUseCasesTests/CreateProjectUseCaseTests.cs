@@ -28,16 +28,16 @@ public class CreateProjectUseCaseTests
 
         var result = await useCase.Execute(projectDto);
 
-        Assert.NotNull(result);
-        Assert.Equal(projectDto.Name, result.Name);
-        Assert.Equal(projectDto.Budget, result.Budget);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(projectDto.Name, result.Value.Name);
+        Assert.Equal(projectDto.Budget, result.Value.Budget);
 
         mockProjectRepo.Verify(r => r.Add(It.IsAny<Project>()), Times.Once);
         mockProjectRepo.Verify(r => r.SaveChanges(), Times.Once);
     }
 
     [Fact]
-    public async Task Execute_whenUserNotExists_ShouldThrowOwnerNotFoundException()
+    public async Task Execute_whenUserNotExists_ShouldReturnFailedResult()
     {
         var mockProjectRepo = new Mock<IProjectRepository>();
         var mockUserRepo = new Mock<IUserRepository>();
@@ -51,7 +51,9 @@ public class CreateProjectUseCaseTests
 
         mockUserRepo.Setup(repo => repo.GetById(ownerId)).ReturnsAsync((User?)null);
 
-        await Assert.ThrowsAsync<OwnerNotFoundException>(() => useCase.Execute(projectDto));
+        var result = await useCase.Execute(projectDto);
+
+        Assert.True(result.IsFailed);
 
         mockProjectRepo.Verify(r => r.Add(It.IsAny<Project>()), Times.Never);
         mockProjectRepo.Verify(r => r.SaveChanges(), Times.Never);

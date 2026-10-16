@@ -2,6 +2,7 @@
 using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
+using FluentResults;
 
 namespace Application.Rooms
 {
@@ -16,13 +17,12 @@ namespace Application.Rooms
             _projectrepo = projectrep;
         }
 
-        public async Task<Room?> Execute(Guid projectId, RoomDto dto)
+        public async Task<Result<Room>> Execute(Guid projectId, RoomDto dto)
         {
             var project = await _projectrepo.GetById(projectId);
             if (project == null)
             {
-                throw new ProjectNotFoundException(projectId);
-
+                return Result.Fail(new ProjectNotFoundError(projectId));
             }
 
             var newRoom = new Room
@@ -36,7 +36,7 @@ namespace Application.Rooms
             await _repo.Add(newRoom);
             await _repo.SaveChanges();
 
-            return newRoom;
+            return Result.Ok(newRoom);
         }
     }
 }

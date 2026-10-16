@@ -3,6 +3,7 @@ using Application.Exceptions;
 using Domain.Entities;
 using Shared.DTO;
 using Domain.Enums;
+using FluentResults;
 
 namespace Application.Tasks
 {
@@ -18,12 +19,12 @@ namespace Application.Tasks
 
         }
 
-        public async Task<TaskItem> Execute(Guid taskId, TaskDto dto)
+        public async Task<Result<TaskItem>> Execute(Guid taskId, TaskDto dto)
         {
             var task = await _repo.GetTask(taskId);
             if (task == null)
             {
-                throw new TaskNotFoundException(taskId);
+                return Result.Fail(new TaskNotFoundError(taskId));
             }
 
             task.UpdateTask(dto.Title, dto.Description, dto.IsCompleted);
@@ -31,7 +32,7 @@ namespace Application.Tasks
             var room = await _roomRepo.GetRoomWithTaskAndSubTasks(task.RoomId);
             if (room == null)
             {
-                throw new RoomNotFoundException(task.RoomId);
+                return Result.Fail(new RoomNotFoundError(task.RoomId));
             }
             
             var IncompletedTasks = room.Tasks.Where(i => !i.IsCompleted);
@@ -48,7 +49,7 @@ namespace Application.Tasks
             }
 
             await _repo.SaveChanges();
-            return task;
+            return Result.Ok(task);
         }
     }
 }

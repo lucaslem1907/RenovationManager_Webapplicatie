@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
 using Domain.Entities;
+using FluentResults;
 
 namespace Application.Tasks
 {
@@ -16,49 +17,43 @@ namespace Application.Tasks
 
         }
 
-        public async Task<IEnumerable<TaskItem>> GetTasksByRoomId(Guid roomId)
+        public async Task<Result<IEnumerable<TaskItem>>> GetTasksByRoomId(Guid roomId)
         {
             var room = await _roomrepo.GetRoomById(roomId);
             if (room == null)
             { 
-                throw new RoomNotFoundException(roomId);
+                return Result.Fail(new RoomNotFoundError(roomId));
             }
             var tasks = await _repo.GetTasksByRoomId(roomId);
-            if (tasks == null)
-            {
-                return null;
-            }
-
-            return tasks;
+            return Result.Ok(tasks ?? Enumerable.Empty<TaskItem>());
 
         }
 
-        public async Task<IEnumerable<TaskItem>> GetAllTasks()
+        public async Task<Result<IEnumerable<TaskItem>>> GetAllTasks()
         {
             var tasks = await _repo.GetAll();
-            if (tasks == null) { return null; }
-            return tasks;
+            return Result.Ok(tasks ?? Enumerable.Empty<TaskItem>());
         }
 
-        public async Task<TaskItem> getTask(Guid taskId)
+        public async Task<Result<TaskItem>> getTask(Guid taskId)
         {
             var task = await _repo.GetTask(taskId);
             if (task == null)
             {
-                throw new TaskNotFoundException(taskId);
+                return Result.Fail(new TaskNotFoundError(taskId));
             }
 
-            return task;
+            return Result.Ok(task);
         }
-        public async Task<TaskItem> getTaskWithSubtasks(Guid taskId)
+        public async Task<Result<TaskItem>> getTaskWithSubtasks(Guid taskId)
         {
             var task = await _repo.GetTask(taskId);
             if (task == null) 
             {
-                throw new TaskNotFoundException(taskId);
+                return Result.Fail(new TaskNotFoundError(taskId));
             }
 
-            return task;
+            return Result.Ok(task);
         }
     }
 }

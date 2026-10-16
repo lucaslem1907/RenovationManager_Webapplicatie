@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
+using FluentResults;
 
 namespace Application.Expenses
 {
@@ -13,13 +14,16 @@ namespace Application.Expenses
 
         }
 
-        public async Task<bool> Execute(Guid expenseId)
+        public async Task<Result<bool>> Execute(Guid expenseId)
         {
             var expense = await _repo.GetExpenseById(expenseId);
-            if (expense == null) { throw new ExpenseNotFoundException(expenseId); }
+            if (expense == null)
+            {
+                return Result.Fail(new ExpenseNotFoundError(expenseId));
+            }
             await _repo.Delete(expense);
             await _repo.SaveChanges();
-            return true;
+            return Result.Ok(true);
 
         }
     }

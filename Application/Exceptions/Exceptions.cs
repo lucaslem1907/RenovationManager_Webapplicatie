@@ -1,80 +1,155 @@
-using Application.Exceptions;
-using Microsoft.AspNetCore.Mvc;
+using FluentResults;
 
 namespace Application.Exceptions
 {
 
-    public abstract class BaseException : Exception
+    public sealed class ProjectNotFoundError : Error
     {
-        public string ErrorCode { get; }
-        public int StatusCode { get; }
-
-        protected BaseException(string errorCode, string message, int statusCode = 400) : base(message)
+        public ProjectNotFoundError(Guid projectId)
+            : base($"Project not found for id {projectId}")
         {
-            ErrorCode = errorCode;
-            StatusCode = statusCode;
+            Metadata["ErrorCode"] = "PROJECT_NOT_FOUND";
         }
     }
 
-    public class ProjectNotFoundException : BaseException
+    public class BudgetExceededError : Error
     {
-        public ProjectNotFoundException(Guid projectId) : base("PROJECT_NOT_FOUND", $"Project not found for id {projectId}", 404)
+        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = {Budget}")
         {
+            Metadata["ErrorCode"] = "BUDGET_EXCEEDED";
         }
     }
 
-    public class BudgetExceededException : BaseException
+    public class OwnerNotFoundError : Error
     {
-        public BudgetExceededException(decimal? Budget) : base("BUDGET_EXCEEDED", $"Budget exceeded, total budget = {Budget}", 409)
+        public OwnerNotFoundError(Guid ownerId) : base($"Owner not found for id {ownerId}")
         {
+            Metadata["ErrorCode"] = "OWNER_NOT_FOUND";
         }
     }
 
-    public class OwnerNotFoundException : BaseException
+    public class ExpenseNotFoundError : Error
     {
-        public OwnerNotFoundException(Guid ownerId) : base("OWNER_NOT_FOUND", $"Owner not found for id {ownerId}", 404)
+        public ExpenseNotFoundError(Guid expenseId) : base($"Expense not found for id {expenseId}")
         {
+            Metadata["ErrorCode"] = "EXPENSE_NOT_FOUND";
         }
     }
 
-    public class ExpenseNotFoundException : BaseException
+    public class RoomNotFoundError : Error
     {
-        public ExpenseNotFoundException(Guid expenseId) : base("EXPENSE_NOT_FOUND", $"Expense not found for id {expenseId}", 404)
+        public RoomNotFoundError(Guid roomId) : base($"Room not found for id {roomId}")
         {
+            Metadata["ErrorCode"] = "ROOM_NOT_FOUND";
         }
     }
 
-    public class RoomNotFoundException : BaseException
+    public class NotFoundError : Error
     {
-        public RoomNotFoundException(Guid roomId) : base("ROOM_NOT_FOUND", $"Room not found for id {roomId}", 404)
+        public NotFoundError(string message) : base(message)
         {
+            Metadata["ErrorCode"] = "NOT_FOUND";
+        }
+    }
+
+    public class TaskNotFoundError : Error
+    {
+        public TaskNotFoundError(Guid taskId) : base($"Task not found for id {taskId}")
+        {
+            Metadata["ErrorCode"] = "TASK_NOT_FOUND";
+        }
+    }
+
+    public class SubTaskNotFoundError : Error
+    {
+        public SubTaskNotFoundError(Guid subTaskId) : base($"Subtask not found for id: {subTaskId}")
+        {
+            Metadata["ErrorCode"] = "SUBTASK_NOT_FOUND";
+        }
+    }
+
+    public class DuplicateEmailError : Error
+    {
+        public DuplicateEmailError(string email) : base($"A user already exists with email {email}")
+        {
+            Metadata["ErrorCode"] = "DUPLICATE_EMAIL";
+        }
+    }
+
+    public class InvalidCredentialsError : Error
+    {
+        public InvalidCredentialsError() : base("Invalid login or password")
+        {
+            Metadata["ErrorCode"] = "INVALID_CREDENTIALS";
+        }
+    }
+
+    public class UserProjectsNotFoundError : Error
+    {
+        public UserProjectsNotFoundError(Guid userId) : base($"No projects found for user id {userId}")
+        {
+            Metadata["ErrorCode"] = "USER_PROJECTS_NOT_FOUND";
         }
     }
 
     public class TaskNotFoundException : BaseException
     {
-        public TaskNotFoundException(Guid taskId) : base("TASK_NOT_FOUND", $"Task not found for id {taskId}")
+        public TaskNotFoundException(Guid taskId) : base($"Task not found for id {taskId}")
         {
         }
     }
 
     public class SubTaskNotFoundException : BaseException
     {
-        public SubTaskNotFoundException(Guid subTaskId) : base("SUBTASK_NOT_FOUND", $"Subtask not found for id: {subTaskId}")
+        public SubTaskNotFoundException(Guid subTaskId) : base($"Subtask not found for id: {subTaskId}")
         { }
     }
 
-    public class NotFoundException : BaseException
+    public class ProjectNotFoundException : BaseException
     {
-        public NotFoundException(string message) : base("NOT_FOUND", message, 404)
+        public ProjectNotFoundException(Guid projectId) : base($"Project not found for id {projectId}")
         {
         }
     }
 
+    public class NotFoundException : BaseException
+    {
+        public NotFoundException() : base($"not found")
+        {
+        }
+    }
 
+    public class ExpenseNotFoundException : BaseException
+    {
+        public ExpenseNotFoundException(Guid expenseId)
+            : base($"Expense not found for id {expenseId}")
+        {
+        }
+    }
 
+    public class RoomNotFoundException : BaseException
+    {
+        public RoomNotFoundException(Guid roomId)
+            : base($"Room not found for id {roomId}")
+        {
+        }
+    }
 
+    public class OwnerNotFoundException : BaseException
+    {
+        public OwnerNotFoundException(Guid ownerId)
+            : base($"Owner not found for id {ownerId}")
+        {
+        }
+    }
 
+    public class BaseException : Exception
+    {
+        public BaseException(string message) : base(message)
+        {
+        }
 
     }
+}
+
 

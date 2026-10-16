@@ -41,7 +41,10 @@ namespace Application.Tests.ExpenseUseCasesTests
             mockExpenseRepo.Setup(repo => repo.GetExpenseById(expenseId)).ReturnsAsync((Expense?)null);
 
             //Act & Assert
-            await Assert.ThrowsAsync<ExpenseNotFoundException>(() => useCase.Execute(expenseId));
+            var result = await useCase.Execute(expenseId);
+            Assert.False(result.IsSuccess);
+            Assert.True(result.Errors.First() is ExpenseNotFoundError);
+
             mockExpenseRepo.Verify(r => r.Delete(It.IsAny<Expense>()), Times.Never);
             mockExpenseRepo.Verify(r => r.SaveChanges(), Times.Never);
         }

@@ -1,7 +1,5 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Shared.Builders.EntityBuilders;
-using Shared.Builders.DtoBuilders;
 using Application.Rooms;
 using Domain.Entities;
 using Moq;
@@ -34,8 +32,10 @@ namespace Application.Tests.RoomUseCasesTests
             mockExpenseRepo.Setup(r => r.GetExpensesByRoomId(existingRoom.Id)).ReturnsAsync(new List<Expense> { expense });
 
             // Act
-            await useCase.Execute(existingRoom.Id, true);
+            var result = await useCase.Execute(existingRoom.Id, true);
             // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
             mockRepo.Verify(r => r.Delete(existingRoom), Times.Once);
             mockExpenseRepo.Verify(r => r.DeleteRange(It.Is<IEnumerable<Expense>>(expenses => expenses.Contains(expense))), Times.Once);
             mockRepo.Verify(r => r.SaveChanges(), Times.Once);
@@ -63,15 +63,17 @@ namespace Application.Tests.RoomUseCasesTests
             mockExpenseRepo.Setup(r => r.GetExpensesByRoomId(existingRoom.Id)).ReturnsAsync(new List<Expense> { expense });
 
             // Act
-            await useCase.Execute(existingRoom.Id, false);
+            var result = await useCase.Execute(existingRoom.Id, false);
             // Assert
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
             mockRepo.Verify(r => r.Delete(existingRoom), Times.Once);
             mockExpenseRepo.Verify(r => r.DeleteRange(It.IsAny<IEnumerable<Expense>>()), Times.Never);
             mockRepo.Verify(r => r.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task DoNotExecute_WhenRoomDoesNotExist_ShouldThrowRoomNotFoundException()
+        public async Task DoNotExecute_WhenRoomDoesNotExist_ShouldReturnFailedResult()
         {
             // Arrange
             var mockRepo = new Mock<IRoomRepository>();
@@ -84,7 +86,8 @@ namespace Application.Tests.RoomUseCasesTests
             mockRepo.Setup(r => r.GetRoomById(nonExistentRoomId)).ReturnsAsync((Room?)null);
 
             // Act & Assert
-            await Assert.ThrowsAsync<RoomNotFoundException>(() => useCase.Execute(nonExistentRoomId, true));
+            var result = await useCase.Execute(nonExistentRoomId, true);
+            Assert.True(result.IsFailed);
 
             mockRepo.Verify(r => r.Delete(It.IsAny<Room>()), Times.Never);
             mockExpenseRepo.Verify(r => r.DeleteRange(It.IsAny<IEnumerable<Expense>>()), Times.Never);

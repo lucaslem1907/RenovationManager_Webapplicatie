@@ -1,5 +1,4 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Projects;
 using Domain.Entities;
 using Moq;
@@ -37,12 +36,12 @@ namespace Application.Tests.ProjectTestUseCases
             var result = await useCase.Execute(project.Id, ProjectDto);
 
             //Assert
-            Assert.NotNull(result);
-            Assert.Equal("Aangepaste Naam", result.Name);
-            Assert.Equal("Aangepast Adres", result.Address);
-            Assert.Equal("toevoegen beschrijving", result.Description);
-            Assert.Equal(10000, result.Budget);
-            Assert.Equal(DateTime.Now.Date, result.StartDate.Date);
+            Assert.True(result.IsSuccess);
+            Assert.Equal("Aangepaste Naam", result.Value.Name);
+            Assert.Equal("Aangepast Adres", result.Value.Address);
+            Assert.Equal("toevoegen beschrijving", result.Value.Description);
+            Assert.Equal(10000, result.Value.Budget);
+            Assert.Equal(DateTime.Now.Date, result.Value.StartDate.Date);
 
             mockProjectRepo.Verify(r => r.SaveChanges(), Times.Once);
 
@@ -50,7 +49,7 @@ namespace Application.Tests.ProjectTestUseCases
         }
 
         [Fact]
-        public async Task Execute_WhenProjectDoesNotExist_ShouldThrowProjectNotFoundException()
+        public async Task Execute_WhenProjectDoesNotExist_ShouldReturnFailedResult()
         {
             //Arrange 
             var mockProjectRepo = new Mock<IProjectRepository>();
@@ -64,10 +63,11 @@ namespace Application.Tests.ProjectTestUseCases
                 .WithStartDate(DateTime.Now)
                 .Build();
             //setup
-            mockProjectRepo.Setup(repo => repo.GetByIdWithDetails(It.IsAny<Guid>())).ReturnsAsync((Project?)null);
+            mockProjectRepo.Setup(repo => repo.GetById(It.IsAny<Guid>())).ReturnsAsync((Project?)null);
 
             //Act & Assert
-            await Assert.ThrowsAsync<ProjectNotFoundException>(() => useCase.Execute(Guid.NewGuid(), ProjectDto));
+            var result = await useCase.Execute(Guid.NewGuid(), ProjectDto);
+            Assert.True(result.IsFailed);
             mockProjectRepo.Verify(r => r.SaveChanges(), Times.Never);
 
         }

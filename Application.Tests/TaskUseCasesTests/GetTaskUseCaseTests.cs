@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Application.Exceptions;
 using Application.Tasks;
 using Domain.Entities;
 using Moq;
@@ -24,12 +23,12 @@ namespace Application.Tests.TaskUseCasesTests
 
             var result = await useCase.GetTasksByRoomId(room.Id);
 
-            Assert.NotNull(result);
-            Assert.Single(result);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Value);
         }
 
         [Fact]
-        public async Task GetTasksByRoomId_WhenRoomDoesNotExist_ShouldThrowRoomNotFoundException()
+        public async Task GetTasksByRoomId_WhenRoomDoesNotExist_ShouldReturnFailedResult()
         {
             var mockTaskRepo = new Mock<ITaskRepository>();
             var mockRoomRepo = new Mock<IRoomRepository>();
@@ -39,7 +38,8 @@ namespace Application.Tests.TaskUseCasesTests
 
             mockRoomRepo.Setup(repo => repo.GetRoomById(roomId)).ReturnsAsync((Room?)null);
 
-            await Assert.ThrowsAsync<RoomNotFoundException>(() => useCase.GetTasksByRoomId(roomId));
+            var result = await useCase.GetTasksByRoomId(roomId);
+            Assert.True(result.IsFailed);
 
             mockTaskRepo.Verify(repo => repo.GetTasksByRoomId(It.IsAny<Guid>()), Times.Never);
 
@@ -61,12 +61,12 @@ namespace Application.Tests.TaskUseCasesTests
 
             var result = await useCase.GetAllTasks();
 
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
+            Assert.True(result.IsSuccess);
+            Assert.Equal(2, result.Value.Count());
         }
 
         [Fact]
-        public async Task getTask_WhenTaskDoesNotExist_ShouldThrowTaskNotFoundException()
+        public async Task getTask_WhenTaskDoesNotExist_ShouldReturnFailedResult()
         {
             var mockTaskRepo = new Mock<ITaskRepository>();
             var mockRoomRepo = new Mock<IRoomRepository>();
@@ -75,7 +75,8 @@ namespace Application.Tests.TaskUseCasesTests
 
             mockTaskRepo.Setup(repo => repo.GetTask(taskId)).ReturnsAsync((TaskItem?)null);
 
-            await Assert.ThrowsAsync<TaskNotFoundException>(() => useCase.getTask(taskId));
+            var result = await useCase.getTask(taskId);
+            Assert.True(result.IsFailed);
 
             mockTaskRepo.Verify(repo => repo.GetTask(It.IsAny<Guid>()), Times.Once);
 
@@ -93,8 +94,8 @@ namespace Application.Tests.TaskUseCasesTests
 
             var result = await useCase.getTaskWithSubtasks(task.Id);
 
-            Assert.NotNull(result);
-            Assert.Equal(task.Id, result.Id);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(task.Id, result.Value.Id);
         }
     }
 }

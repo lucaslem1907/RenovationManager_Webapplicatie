@@ -1,12 +1,10 @@
 ﻿using Domain.Entities;
 using Domain.Enums;
 using Application.Interfaces;
-using Application.Exceptions;
 using Shared.Builders.EntityBuilders;
 using Shared.Builders.DtoBuilders;
 using Application.Rooms;
 using Moq;
-using Shouldly;
 
 
 
@@ -37,7 +35,7 @@ namespace Application.Tests.RoomUseCasesTests
             // Act
             var result = await useCase.Execute(existingRoom.Id, roomDto);
             // Assert
-            Assert.NotNull(result);
+            Assert.True(result.IsSuccess);
             Assert.Equal("New Name", existingRoom.Name);
             Assert.Equal(RoomStatus.in_progress, existingRoom.Status);
 

@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
 using Domain.Entities;
+using FluentResults;
 
 namespace Application.Subtaks
 {
@@ -14,22 +15,21 @@ namespace Application.Subtaks
 
         }
 
-        public async Task<Subtask> GetSubTask(Guid subtaskId)
+        public async Task<Result<Subtask>> GetSubTask(Guid subtaskId)
         {
             var subtask = await _repo.GetSubTask(subtaskId);
             if (subtask == null)
             {
-                throw new SubTaskNotFoundException(subtaskId);
+                return Result.Fail(new SubTaskNotFoundError(subtaskId));
             }
-            return subtask;
+            return Result.Ok(subtask);
 
         }
 
-        public async Task<IEnumerable<Subtask>> GetAllTasks()
+        public async Task<Result<IEnumerable<Subtask>>> GetAllTasks()
         {
             var subtasks = await _repo.GetAll();
-            if (subtasks == null) { return null; }
-            return subtasks;
+            return Result.Ok(subtasks ?? Enumerable.Empty<Subtask>());
         }
     }
 }

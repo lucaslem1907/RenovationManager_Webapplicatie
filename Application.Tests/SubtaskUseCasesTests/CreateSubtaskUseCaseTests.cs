@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Application.Tasks;
-using Application.Exceptions;
 using Domain.Entities;
 using Moq;
 using Shared.Builders.DtoBuilders;
@@ -24,15 +23,15 @@ namespace Application.Tests.SubtaskUseCasesTests
 
             var result = await useCase.Execute(task.Id, dto);
 
-            Assert.NotNull(result);
-            Assert.Equal("New subtask", result.Title);
-            Assert.Equal(task.Id, result.TaskItemId);
-            mockSubtaskRepo.Verify(repo => repo.Add(result), Times.Once);
+            Assert.True(result.IsSuccess);
+            Assert.Equal("New subtask", result.Value.Title);
+            Assert.Equal(task.Id, result.Value.TaskItemId);
+            mockSubtaskRepo.Verify(repo => repo.Add(result.Value), Times.Once);
             mockSubtaskRepo.Verify(repo => repo.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task Execute_WhenTaskDoesNotExist_ShouldThrowTaskNotFoundException()
+        public async Task Execute_WhenTaskDoesNotExist_ShouldReturnFailedResult()
         {
             var mockSubtaskRepo = new Mock<ISubtaskRepository>();
             var mockTaskRepo = new Mock<ITaskRepository>();
@@ -42,7 +41,8 @@ namespace Application.Tests.SubtaskUseCasesTests
 
             mockTaskRepo.Setup(repo => repo.GetTask(taskId)).ReturnsAsync((TaskItem?)null);
 
-            await Assert.ThrowsAsync<TaskNotFoundException>(() => useCase.Execute(taskId, dto));
+            var result = await useCase.Execute(taskId, dto);
+            Assert.True(result.IsFailed);
 
             mockSubtaskRepo.Verify(repo => repo.Add(It.IsAny<Subtask>()), Times.Never);
             mockSubtaskRepo.Verify(repo => repo.SaveChanges(), Times.Never);

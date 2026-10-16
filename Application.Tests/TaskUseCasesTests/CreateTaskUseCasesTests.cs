@@ -1,5 +1,4 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Tasks;
 using Domain.Entities;
 using Domain.Enums;
@@ -33,16 +32,16 @@ namespace Application.Tests.TaskUseCasesTests
             //Act
             var result = await useCase.Execute(room.Id, taskDto);
             //Assert
-            Assert.NotNull(result);
-            Assert.Equal("New Task", result.Title);
-            Assert.Equal(room.Id, result.RoomId);
+            Assert.True(result.IsSuccess);
+            Assert.Equal("New Task", result.Value.Title);
+            Assert.Equal(room.Id, result.Value.RoomId);
 
-            mockTaskRepo.Verify(r => r.Add(result), Times.Once);
+            mockTaskRepo.Verify(r => r.Add(result.Value), Times.Once);
             mockTaskRepo.Verify(r => r.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task Execute_WhenRoomNotFound_ShouldThrowRoomNotFoundException()
+        public async Task Execute_WhenRoomNotFound_ShouldReturnFailedResult()
         {
             //Arrange
             var mockTaskRepo = new Mock<ITaskRepository>();
@@ -58,7 +57,8 @@ namespace Application.Tests.TaskUseCasesTests
             mockRoomRepo.Setup(repo => repo.GetRoomById(roomId)).ReturnsAsync((Room)null);
 
             //Act & Assert
-            await Assert.ThrowsAsync<RoomNotFoundException>(() => useCase.Execute(roomId, taskDto));
+            var result = await useCase.Execute(roomId, taskDto);
+            Assert.True(result.IsFailed);
         }
 
         [Fact]
@@ -84,6 +84,7 @@ namespace Application.Tests.TaskUseCasesTests
             var result = await useCase.Execute(room.Id, taskDto);
 
             //Assert
+            Assert.True(result.IsSuccess);
             Assert.Equal(RoomStatus.in_progress, room.Status);
         }
     }

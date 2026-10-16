@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Domain.Entities;
+using FluentResults;
 
 namespace Application.Tasks
 {
@@ -12,12 +14,15 @@ namespace Application.Tasks
 
         }
 
-        public async Task<List<Project>> Execute(Guid UserId)
+        public async Task<Result<List<Project>>> Execute(Guid UserId)
         {
             var projects = await _repo.GetProjectsByUserId(UserId);
-            if (projects == null) { return null; }
+            if (projects == null)
+            {
+                return Result.Fail(new UserProjectsNotFoundError(UserId));
+            }
 
-            return projects;
+            return Result.Ok(projects);
 
         }
     }

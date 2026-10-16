@@ -2,6 +2,7 @@
 using Application.Exceptions;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
+using FluentResults;
 
 namespace Application.Rooms
 {
@@ -15,33 +16,33 @@ namespace Application.Rooms
 
         }
 
-        public async Task<IEnumerable<Room?>> GetRoomsByProjectId(Guid projectId)
+        public async Task<Result<IEnumerable<Room?>>> GetRoomsByProjectId(Guid projectId)
         {
             var rooms = await _repo.GetRoomsByProjectId(projectId);
             if (rooms == null)
             { 
-                throw new ProjectNotFoundException(projectId); 
+                return Result.Fail(new ProjectNotFoundError(projectId));
             }
             return rooms;
 
         }
 
-        public async Task<IEnumerable<Room?>> GetAllRooms()
+        public async Task<Result<IEnumerable<Room?>>> GetAllRooms()
         {
             var rooms = await _repo.GetAll();
             if (rooms == null)
             {
-                throw new NotFoundException("No rooms were found");
+                return Result.Fail(new RoomNotFoundError(Guid.Empty));
             }
             return rooms;
         }
 
-        public async Task<Room?> GetRoomWithTaskAndSubTasks(Guid roomId)
+        public async Task<Result<Room>> GetRoomWithTaskAndSubTasks(Guid roomId)
         {
             var room = await _repo.GetRoomWithTaskAndSubTasks(roomId);
             if (room == null)
             {
-                throw new RoomNotFoundException(roomId);
+                return Result.Fail(new RoomNotFoundError(roomId));
             }
             return room;
         }

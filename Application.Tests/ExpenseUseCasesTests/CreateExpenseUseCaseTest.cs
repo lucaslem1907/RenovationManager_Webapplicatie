@@ -1,12 +1,9 @@
-﻿
+﻿using Application.Expenses;
+using Application.Interfaces;
 using Moq;
-using Xunit;
-using Application.Exceptions;
 using Shared.Builders.DtoBuilders;
 using Shared.Builders.EntityBuilders;
-using Application.Expenses;
-using Domain.Enums;
-using Application.Interfaces;
+using FluentResults;
 
 namespace Application.Tests.ExpenseUseCasesTests
 {
@@ -22,8 +19,8 @@ namespace Application.Tests.ExpenseUseCasesTests
             var createExpenseUseCase = new CreateExpenseUseCase(mockExpenseRepository.Object, mockProjectRepository.Object, mockRoomRepository.Object);
 
 
-            var project = new ProjectBuilder().Build();
-            var room = new RoomBuilder().Build();
+            var project = new ProjectBuilder().WithBudget(1000).Build();
+            var room = new RoomBuilder().WithProjectId(project.Id).Build();
 
             var expenseDto = new ExpenseDtoBuilder()
                 .WithRoomId(room.Id)
@@ -40,18 +37,21 @@ namespace Application.Tests.ExpenseUseCasesTests
             var result = await createExpenseUseCase.Execute(project.Id, expenseDto);
 
             //Assert
-            Assert.NotNull(result);
-            Assert.Equal(expenseDto.Amount, result?.Amount);
-            Assert.Equal(expenseDto.Name, result?.Name);
-            Assert.Equal(expenseDto.RoomId, result?.RoomId);
-            Assert.Equal(expenseDto.Description, result?.Description);
+            Assert.True(result.IsSuccess);
+
+            var createdExpense = result.ValueOrDefault;
+            Assert.NotNull(createdExpense);
+            Assert.Equal(expenseDto.Amount, createdExpense!.Amount);
+            Assert.Equal(expenseDto.Name, createdExpense.Name);
+            Assert.Equal(expenseDto.RoomId, createdExpense.RoomId);
+            Assert.Equal(expenseDto.Description, createdExpense.Description);
 
             mockExpenseRepository.Verify(repo => repo.Add(It.IsAny<Domain.Entities.Expense>()), Times.Once);
             mockExpenseRepository.Verify(repo => repo.SaveChanges(), Times.Once);
         }
 
         [Fact]
-        public async Task CreateExpense_ShouldThrowProjectNotFoundException_WhenProjectDoesNotExist()
+        public async Task CreateExpense_ShouldThrowProjectNotFoundError_WhenProjectDoesNotExist()
         {
             //Arange
             var mockExpenseRepository = new Mock<IExpenseRepository>();
@@ -64,8 +64,10 @@ namespace Application.Tests.ExpenseUseCasesTests
 
             //Setup 
             mockProjectRepository.Setup(repo => repo.GetById(nonExistentProjectId)).ReturnsAsync((Domain.Entities.Project?)null);
-            //Act & Assert
-            await Assert.ThrowsAsync<ProjectNotFoundException>(() => createExpenseUseCase.Execute(nonExistentProjectId, expenseDto));
+            //Act
+            var result = await createExpenseUseCase.Execute(nonExistentProjectId, expenseDto);
+            //Assert
+            Assert.True(result.IsFailed);
         }
 
         [Fact]
@@ -77,8 +79,8 @@ namespace Application.Tests.ExpenseUseCasesTests
             var mockRoomRepository = new Mock<IRoomRepository>();
             var createExpenseUseCase = new CreateExpenseUseCase(mockExpenseRepository.Object, mockProjectRepository.Object, mockRoomRepository.Object);
 
-            var room = new RoomBuilder().Build();
             var project = new ProjectBuilder().WithBudget(100).Build();
+            var room = new RoomBuilder().WithProjectId(project.Id).Build();
             var expenseDto = new ExpenseDtoBuilder().WithAmount(200).WithRoomId(room.Id).WithForceBudget(true).Build();
             //Setup 
             mockProjectRepository.Setup(repo => repo.GetById(project.Id)).ReturnsAsync(project);
@@ -87,9 +89,14 @@ namespace Application.Tests.ExpenseUseCasesTests
             var result = await createExpenseUseCase.Execute(project.Id, expenseDto);
             //Assert
             Assert.NotNull(result);
-            Assert.Equal(expenseDto.Amount, result?.Amount);
-            Assert.Equal(expenseDto.Name, result?.Name);
-            Assert.Equal(expenseDto.RoomId, result?.RoomId);
+            Assert.True(result.IsSuccess);
+
+            var createdExpense = result.ValueOrDefault;
+            Assert.NotNull(createdExpense);
+
+            Assert.Equal(expenseDto.Amount, createdExpense!.Amount);
+            Assert.Equal(expenseDto.Name, createdExpense.Name);
+            Assert.Equal(expenseDto.RoomId, createdExpense.RoomId);
 
             mockExpenseRepository.Verify(repo => repo.Add(It.IsAny<Domain.Entities.Expense>()), Times.Once);
             mockExpenseRepository.Verify(repo => repo.SaveChanges(), Times.Once);

@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Exceptions;
 using Shared.DTO;
+using FluentResults;
 
 namespace Application.Services
 {
@@ -14,12 +15,13 @@ namespace Application.Services
             _project = project;
         }
 
-        public async Task<byte[]> GenerateExcel(Guid projectId)
+        public async Task<Result<byte[]>> GenerateExcel(Guid projectId)
         {
             var project = await _project.GetByIdWithDetails(projectId);
             if (project == null)
             {
-                throw new ProjectNotFoundException(projectId);
+                return Result.Fail<byte[]>(new ProjectNotFoundError(projectId));
+
             }
 
             var projectExportDto = new ProjectExportDto
