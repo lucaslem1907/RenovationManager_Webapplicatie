@@ -1,15 +1,15 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
+﻿using Application.Interfaces;
+using Application.Exceptions;
 using Application.Projects;
 using Application.Services;
 using Domain.Entities;
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Reno.Controllers;
 using Shared.Builders.DtoBuilders;
 using Shared.Builders.EntityBuilders;
 using Xunit;
+using FluentResults;
 
 namespace Reno.Test.ProjectControllerTests;
 

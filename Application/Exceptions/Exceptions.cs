@@ -14,7 +14,7 @@ namespace Application.Exceptions
 
     public class BudgetExceededError : Error
     {
-        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = € {Budget} ")
+        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = {Budget}")
         {
             Metadata["ErrorCode"] = "BUDGET_EXCEEDED";
         }

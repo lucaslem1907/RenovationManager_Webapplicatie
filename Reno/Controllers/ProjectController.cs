@@ -48,7 +48,6 @@ namespace Reno.Controllers
                         return NotFound(error.Message);
                     }
                 }
-
                 return BadRequest(project.Errors);
             }
             return Ok(project.Value);
