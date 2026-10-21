@@ -53,7 +53,15 @@ namespace Reno.Controllers
             var project = await _getProject.Execute(projectId);
             if (project.IsFailed)
             {
-                return NotFound(project.Errors);
+                foreach (var error in project.Errors)
+                {
+                    if (error is OwnerNotFoundError)
+                    {
+                        return NotFound(error.Message);
+                    }
+                }
+
+                return BadRequest(project.Errors);
             }
             return Ok(project.Value);
         }

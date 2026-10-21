@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Exceptions;
 using Application.Projects;
 using Application.Services;
 using Domain.Entities;
@@ -8,6 +9,7 @@ using Reno.Controllers;
 using Shared.Builders.DtoBuilders;
 using Shared.Builders.EntityBuilders;
 using Xunit;
+using FluentResults;
 
 namespace Reno.Test.ProjectControllerTests;
 
@@ -74,7 +76,11 @@ public class ProjectControllerTests
         var result = await controller.GetProject(projectId);
 
         var notFound = Assert.IsType<NotFoundObjectResult>(result.Result);
-        Assert.Equal($"Project not found for id {projectId}", notFound.Value);
+        var errors = Assert.IsAssignableFrom<IEnumerable<IError>>(notFound.Value);
+
+        var error = Assert.IsType<ProjectNotFoundError>(errors.First());
+
+        Assert.Equal($"Project not found for id {projectId}", error.Message);
     }
 
     private static ProjectController CreateController(
