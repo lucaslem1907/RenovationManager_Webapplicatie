@@ -1,7 +1,9 @@
-﻿using Application.Interfaces;
+﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Projects;
 using Application.Services;
 using Domain.Entities;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Reno.Controllers;
@@ -74,7 +76,11 @@ public class ProjectControllerTests
         var result = await controller.GetProject(projectId);
 
         var notFound = Assert.IsType<NotFoundObjectResult>(result.Result);
-        Assert.Equal($"Project not found for id {projectId}", notFound.Value);
+        var errors = Assert.IsAssignableFrom<IEnumerable<IError>>(notFound.Value);
+
+        var error = Assert.IsType<ProjectNotFoundError>(errors.First());
+
+        Assert.Equal($"Project not found for id {projectId}", error.Message);
     }
 
     private static ProjectController CreateController(
