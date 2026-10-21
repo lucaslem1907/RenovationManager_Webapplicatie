@@ -41,14 +41,6 @@ namespace Reno.Controllers
             var project = await _createProject.Execute(dto);
             if (project.IsFailed)
             {
-                foreach (var error in project.Errors)
-                {
-                    if (error is OwnerNotFoundError)
-                    {
-                        return NotFound(error.Message);
-                    }
-                }
-
                 return BadRequest(project.Errors);
             }
             return Ok(project.Value);

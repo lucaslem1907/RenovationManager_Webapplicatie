@@ -11,7 +11,5 @@
     <BuildDependency Project="Application/Application.csproj" />
     <BuildDependency Project="Shared.DTO/Shared.csproj" />
   </Project>
-  <Project Path="Reno.Test/Reno.Test.csproj" />
   <Project Path="Shared.DTO/Shared.csproj" Id="cabe8519-0699-437f-a9a6-b67e88451ffd" />
-
 </Solution>
