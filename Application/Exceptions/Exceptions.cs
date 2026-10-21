@@ -14,7 +14,7 @@ namespace Application.Exceptions
 
     public class BudgetExceededError : Error
     {
-        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = {Budget}")
+        public BudgetExceededError(decimal? Budget) : base($"Budget exceeded, total budget = € {Budget} ")
         {
             Metadata["ErrorCode"] = "BUDGET_EXCEEDED";
         }
@@ -89,49 +89,6 @@ namespace Application.Exceptions
         public UserProjectsNotFoundError(Guid userId) : base($"No projects found for user id {userId}")
         {
             Metadata["ErrorCode"] = "USER_PROJECTS_NOT_FOUND";
-        }
-    }
-
-    public class TaskNotFoundException : BaseException
-    {
-        public TaskNotFoundException(Guid taskId) : base($"Task not found for id {taskId}")
-        {
-        }
-    }
-
-    public class SubTaskNotFoundException : BaseException
-    {
-        public SubTaskNotFoundException(Guid subTaskId) : base($"Subtask not found for id: {subTaskId}")
-        { }
-    }
-
-    public class ProjectNotFoundException : BaseException
-    {
-        public ProjectNotFoundException(Guid projectId) : base($"Project not found for id {projectId}")
-        {
-        }
-    }
-
-    public class NotFoundException : BaseException
-    {
-        public NotFoundException() : base($"not found")
-        {
-        }
-    }
-
-    public class ExpenseNotFoundException : BaseException
-    {
-        public ExpenseNotFoundException(Guid expenseId)
-            : base($"Expense not found for id {expenseId}")
-        {
-        }
-    }
-
-    public class RoomNotFoundException : BaseException
-    {
-        public RoomNotFoundException(Guid roomId)
-            : base($"Room not found for id {roomId}")
-        {
         }
     }
 
