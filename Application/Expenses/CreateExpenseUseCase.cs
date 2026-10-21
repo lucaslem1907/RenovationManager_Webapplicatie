@@ -28,6 +28,9 @@ namespace Application.Expenses
             }
 
 
+
+
+
             if (dto.RoomId.HasValue)
             {
                 var room = await _roomRepo.GetRoomById(dto.RoomId.Value);
