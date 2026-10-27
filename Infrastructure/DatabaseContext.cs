@@ -1,12 +1,13 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<User, IdentityRole, string>
     {
 
-        public DbSet<User> Users => Set<User>();
         public DbSet<Project> RenovationProjects => Set<Project>();
         public DbSet<Room> Rooms => Set<Room>();
 
@@ -26,8 +27,6 @@ namespace Infrastructure
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(u => u.Id);
-
                 entity.HasMany(u => u.Projects)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)

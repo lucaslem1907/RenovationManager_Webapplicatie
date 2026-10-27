@@ -44,7 +44,7 @@ public class CreateProjectUseCaseTests
 
         var useCase = new CreateProjectUseCase(mockProjectRepo.Object, mockUserRepo.Object);
 
-        var ownerId = Guid.NewGuid();
+        var ownerId = Guid.NewGuid().ToString();
         var projectDto = new ProjectDtoBuilder()
             .WithOwnerId(ownerId)
             .Build();

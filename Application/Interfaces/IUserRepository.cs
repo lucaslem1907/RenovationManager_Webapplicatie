@@ -6,7 +6,7 @@ namespace Application.Interfaces
     {
         Task<List<User>> GetAll();
         Task<User?> GetByLogin(string login);
-        Task<User?> GetById(Guid id);
+        Task<User?> GetById(string id);
         Task<bool> EmailExists(string email);
         Task Add(User user);
         Task SaveChanges();

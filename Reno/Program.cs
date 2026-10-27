@@ -1,10 +1,14 @@
 using Application;
 using Infrastructure;
+using Infrastructure.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +27,9 @@ builder.Services.AddAuthentication("Bearer")
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+        // Set the claim types for role and name
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name,
 
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
@@ -30,16 +37,22 @@ builder.Services.AddAuthentication("Bearer")
     };
 });
 
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 
-builder.Services.AddControllers()
+builder.Services
+    .AddControllers(options =>
+    {
+        options.Filters.Add(new AuthorizeFilter());
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -88,6 +101,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<DatabaseContext>();
         await context.Database.MigrateAsync();
+        await RoleSeeder.SeedRoles(services);
     }
     catch (Exception ex)
     {

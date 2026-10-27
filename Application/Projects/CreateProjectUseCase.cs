@@ -19,7 +19,7 @@ namespace Application.Projects
 
         public async Task<Result<Project>> Execute(ProjectDto dto)
         {
-            Guid ownerId = dto.OwnerId;
+            string ownerId = dto.OwnerId;
             var owner = await _userRepo.GetById(ownerId);
 
             if (owner == null)
