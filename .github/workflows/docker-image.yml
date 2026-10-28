@@ -22,9 +22,12 @@ jobs:
       # Restore dependencies
       - name: restore dependencies
         run: dotnet restore
-      # Test-fase
-      - name: run dotnet tests
-        run: dotnet test --no-restore
+      # Integration tests 
+      - name: run integration tests
+        run: dotnet test --no-restore --filter Category=Integration
+      # unit tests 
+      - name: run unit tests
+        run: dotnet test --no-restore --filter Category!=Integration
       # Build
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)

@@ -12,7 +12,7 @@ public class Project
 
     public DateTime StartDate { get; private set; } = DateTime.UtcNow;
 
-    public Guid OwnerId { get; private set; }
+    public string OwnerId { get; private set; }
     public User Owner { get; private set; }
 
     public ICollection<Room> Rooms { get; private set; } = new List<Room>();

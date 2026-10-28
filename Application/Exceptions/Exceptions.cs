@@ -22,7 +22,7 @@ namespace Application.Exceptions
 
     public class OwnerNotFoundError : Error
     {
-        public OwnerNotFoundError(Guid ownerId) : base($"Owner not found for id {ownerId}")
+        public OwnerNotFoundError(string ownerId) : base($"Owner not found for id {ownerId}")
         {
             Metadata["ErrorCode"] = "OWNER_NOT_FOUND";
         }
@@ -86,15 +86,21 @@ namespace Application.Exceptions
 
     public class UserProjectsNotFoundError : Error
     {
-        public UserProjectsNotFoundError(Guid userId) : base($"No projects found for user id {userId}")
+        public UserProjectsNotFoundError(string userId) : base($"No projects found for user id {userId}")
         {
             Metadata["ErrorCode"] = "USER_PROJECTS_NOT_FOUND";
         }
     }
-
+    public class RoleNotFoundError : Error
+    {
+        public RoleNotFoundError(string roleName) : base($"Role not found for name {roleName}")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_FOUND";
+        }
+    }
     public class OwnerNotFoundException : BaseException
     {
-        public OwnerNotFoundException(Guid ownerId)
+        public OwnerNotFoundException(string ownerId)
             : base($"Owner not found for id {ownerId}")
         {
         }

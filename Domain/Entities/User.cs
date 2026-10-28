@@ -1,16 +1,14 @@
-﻿namespace Domain.Entities
-{
-    public class User
-    {
-        public Guid Id { get; private set; }
+﻿using Microsoft.AspNetCore.Identity;
 
+namespace Domain.Entities
+{
+    public class User : IdentityUser
+    {
         public string Login { get; private set; }
         public string FirstName { get; private set; }
 
         public string LastName { get; private set; }
 
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
         public DateTime Created { get; private set; }
 
         public ICollection<Project> Projects { get; private set; } = new List<Project>();
@@ -19,12 +17,29 @@
 
         public User(string firstName, string lastName, string email, string passwordHash)
         {
-            Id = Guid.NewGuid();
+            Id = Guid.NewGuid().ToString();
             LoginGenerator loginObj = new LoginGenerator(firstName, lastName);
             Login = loginObj.Value;
+            UserName = Login;
+            NormalizedUserName = UserName.ToUpperInvariant();
             FirstName = firstName;
             LastName = lastName;
             Email = email;
+            NormalizedEmail = Email.ToUpperInvariant();
+            Created = DateTime.UtcNow;
+            PasswordHash = passwordHash;
+        }
+
+        public User(string firstName, string lastName, string login, string email, string passwordHash)
+        {
+            Id = Guid.NewGuid().ToString();
+            Login = login;
+            UserName = Login;
+            NormalizedUserName = UserName.ToUpperInvariant();
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            NormalizedEmail = Email.ToUpperInvariant();
             Created = DateTime.UtcNow;
             PasswordHash = passwordHash;
         }
@@ -36,7 +51,7 @@
 
         public LoginGenerator(string firstname, string lastName)
         {
-            Value = LoginGenerator.CreateLogin(firstname, lastName);
+            Value = CreateLogin(firstname, lastName);
         }
 
         private LoginGenerator() { }

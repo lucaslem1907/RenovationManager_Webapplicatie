@@ -11,6 +11,6 @@
         public decimal Budget { get; set; }
 
         public DateTime StartDate { get; set; }
-        public Guid OwnerId { get; set; }
+        public string OwnerId { get; set; } = string.Empty;
     }
 }
