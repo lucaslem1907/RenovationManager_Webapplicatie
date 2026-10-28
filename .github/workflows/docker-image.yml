@@ -23,7 +23,7 @@ jobs:
       - name: restore dependencies
         run: dotnet restore
       # Integration tests 
-      - name: run dotnet tests
+      - name: run integration tests
         run: dotnet test --no-restore --filter Category=Integration
       # unit tests 
       - name: run unit tests
