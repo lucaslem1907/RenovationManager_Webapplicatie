@@ -20,7 +20,7 @@ namespace Application.Tests.UserUseCasesTests
             var mockRepo = new Mock<IUserRepository>();
             var mockAuthService = new Mock<IAuthService>();
             var useCase = new LoginUseCase(mockRepo.Object, mockAuthService.Object);
-            
+
             // Act
             var User = new UserBuilder()
                 .WithLogin("testuser")
@@ -31,7 +31,7 @@ namespace Application.Tests.UserUseCasesTests
                 .WithPassword("ValidPasswordHash")
                 .Build();
 
-           // Assert
+            // Assert
             mockRepo.Setup(repo => repo.GetByLogin("testuser")).ReturnsAsync(User);
             mockAuthService.Setup(auth => auth.VerifyPassword(userLoginDto.password, User.PasswordHash)).Returns(true);
             mockAuthService.Setup(auth => auth.GenerateToken(User)).ReturnsAsync("token");
@@ -66,3 +66,4 @@ namespace Application.Tests.UserUseCasesTests
             Assert.Null(result.token);
         }
     }
+}
