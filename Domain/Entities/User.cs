@@ -21,9 +21,25 @@ namespace Domain.Entities
             LoginGenerator loginObj = new LoginGenerator(firstName, lastName);
             Login = loginObj.Value;
             UserName = Login;
+            NormalizedUserName = UserName.ToUpperInvariant();
             FirstName = firstName;
             LastName = lastName;
             Email = email;
+            NormalizedEmail = Email.ToUpperInvariant();
+            Created = DateTime.UtcNow;
+            PasswordHash = passwordHash;
+        }
+
+        public User(string firstName, string lastName, string login, string email, string passwordHash)
+        {
+            Id = Guid.NewGuid().ToString();
+            Login = login;
+            UserName = Login;
+            NormalizedUserName = UserName.ToUpperInvariant();
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            NormalizedEmail = Email.ToUpperInvariant();
             Created = DateTime.UtcNow;
             PasswordHash = passwordHash;
         }
@@ -35,7 +51,7 @@ namespace Domain.Entities
 
         public LoginGenerator(string firstname, string lastName)
         {
-            Value = LoginGenerator.CreateLogin(firstname, lastName);
+            Value = CreateLogin(firstname, lastName);
         }
 
         private LoginGenerator() { }

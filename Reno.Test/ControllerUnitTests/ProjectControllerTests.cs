@@ -11,7 +11,7 @@ using Shared.Builders.EntityBuilders;
 using Xunit;
 using FluentResults;
 
-namespace Reno.Test.ProjectControllerTests;
+namespace Reno.Test.ControllerUnitTests;
 
 public class ProjectControllerTests
 {
