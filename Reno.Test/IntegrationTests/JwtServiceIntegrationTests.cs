@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Reno.Test.Integration;
 
+[Trait("Category", "Integration")]
 public class JwtServiceIntegrationTests
 {
     [Fact]

@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Reno.Test.Integration;
 
+[Trait("Category", "Integration")]
 public class AdministrationIntegrationTests : IClassFixture<WebAppFactory>
 {
     private readonly HttpClient _client;
