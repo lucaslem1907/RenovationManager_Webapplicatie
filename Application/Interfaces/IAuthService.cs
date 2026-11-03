@@ -6,6 +6,6 @@ namespace Application.Interfaces
     {
         string HashPassword(string password);
         bool VerifyPassword(string password, string hash);
-        string GenerateToken(User user);
+        Task<string> GenerateToken(User user);
     }
 }

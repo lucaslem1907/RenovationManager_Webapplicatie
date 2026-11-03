@@ -14,7 +14,7 @@ namespace Application.Tasks
 
         }
 
-        public async Task<Result<List<Project>>> Execute(Guid UserId)
+        public async Task<Result<List<Project>>> Execute(string UserId)
         {
             var projects = await _repo.GetProjectsByUserId(UserId);
             if (projects == null)

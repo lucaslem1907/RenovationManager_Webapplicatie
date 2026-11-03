@@ -1,12 +1,13 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<User, IdentityRole, string>
     {
 
-        public DbSet<User> Users => Set<User>();
         public DbSet<Project> RenovationProjects => Set<Project>();
         public DbSet<Room> Rooms => Set<Room>();
 
@@ -26,8 +27,6 @@ namespace Infrastructure
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.HasKey(u => u.Id);
-
                 entity.HasMany(u => u.Projects)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
@@ -37,19 +36,19 @@ namespace Infrastructure
             modelBuilder.Entity<Project>(entity =>
             {
                 entity.Property(p => p.Budget)
-                      .HasColumnType("decimal(18,2)"); 
+                      .HasColumnType("decimal(18,2)");
 
                 entity.HasMany(p => p.Rooms)
                 .WithOne(r => r.Project)
                 .HasForeignKey(r => r.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-                
+
 
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.HasKey(r => r.Id);
-                
+
                 entity.Property(r => r.Name)
                     .IsRequired()
                     .HasMaxLength(200);
@@ -59,7 +58,7 @@ namespace Infrastructure
                 .HasForeignKey(t => t.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-                
+
 
             modelBuilder.Entity<TaskItem>(entity =>
             {
@@ -70,7 +69,7 @@ namespace Infrastructure
                 .HasForeignKey(s => s.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-            
+
 
 
             modelBuilder.Entity<Expense>(entity =>

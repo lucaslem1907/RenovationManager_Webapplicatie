@@ -5,7 +5,7 @@ namespace Application.Interfaces
     public interface IProjectRepository
     {
         Task<List<Project>> GetAll();
-        Task<List<Project>> GetProjectsByUserId(Guid userId);
+        Task<List<Project>> GetProjectsByUserId(string userId);
         Task<Project?> GetById(Guid id);
         Task<Project?> GetByIdWithDetails(Guid id);
         Task Add(Project project);

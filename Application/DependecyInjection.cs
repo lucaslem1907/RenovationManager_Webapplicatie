@@ -1,4 +1,5 @@
 ﻿using Application.Expenses;
+using Application.Administration;
 using Application.Projects;
 using Application.Rooms;
 using Application.Services;
@@ -15,6 +16,7 @@ namespace Application
         {
             services.AddScoped<RegisterUseCase>();
             services.AddScoped<LoginUseCase>();
+            services.AddScoped<AdministrationUsecase>();
             services.AddScoped<GetUserProjectsUseCase>();
 
             services.AddScoped<CreateProjectUseCase>();

@@ -16,7 +16,7 @@ namespace Reno.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<Project>>> GetUserProjects(Guid userId)
+        public async Task<ActionResult<IEnumerable<Project>>> GetUserProjects(string userId)
         {
             var userProjects = await _GetUserProjects.Execute(userId);
             if (userProjects.IsFailed)
