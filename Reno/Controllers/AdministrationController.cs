@@ -2,7 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Application.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Shared.DTO;
+using Domain.Entities;
+using Shared.Dto;
 namespace Reno.Controllers
+ 
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -54,6 +58,24 @@ namespace Reno.Controllers
                 }
             }
             return Ok("Role deleted successfully");
+        }
+
+        [HttpGet("get_full_userDetail")]
+        public async Task<ActionResult<List<UserAdministrationDto>>> GetFullUsers([FromQuery] UserAdministrationDto userDto)
+        {
+            var result = await _adminUseCase.ExecuteGetFullUserDetail(userDto.Id, userDto.Email, userDto.UserName, userDto.FirstName, userDto.LastName);
+
+            if (result.IsFailed)
+            {
+                switch (result.Errors.First())
+                {
+                    case OwnerNotFoundError:
+                        return NotFound(result.Errors.First().Message);
+                    default:
+                        return BadRequest("An error occurred");
+                }
+            }
+            return Ok(result.Value);
         }
     }
 }

@@ -1,3 +1,4 @@
+using Shared.Dto;
 using Shared.DTO;
 
 namespace Shared.Builders.DtoBuilders;
@@ -12,11 +13,11 @@ public class UserDtoBuilder
         return this;
     }
 
-    public UserDTO Build()
+    public UserDto Build()
     {
-        return new UserDTO
+        return new UserDto
         {
-            Id = _id
+            Id = _id.ToString()
         };
     }
 }

@@ -17,7 +17,8 @@ namespace Infrastructure.Helpers
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
-
+            // Add Identity services with custom password requirements
+            // 
             services.AddIdentityCore<User>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -28,6 +29,7 @@ namespace Infrastructure.Helpers
             })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DatabaseContext>();
+
             services.AddScoped<PasswordService>();
             services.AddScoped<JwtService>();
 

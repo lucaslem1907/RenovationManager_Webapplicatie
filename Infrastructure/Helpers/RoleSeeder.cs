@@ -10,7 +10,6 @@ namespace Infrastructure.Helpers
         {
             // SEED ROLES
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
             string[] roleNames = { "Admin", "User", "Viewer" };
 

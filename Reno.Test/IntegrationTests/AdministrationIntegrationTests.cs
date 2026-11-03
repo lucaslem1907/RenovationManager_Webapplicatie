@@ -37,7 +37,7 @@ public class AdministrationIntegrationTests : IClassFixture<WebAppFactory>
         var token = await TestJwtTokenFactory.CreateTokenAsync("Admin");
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/Administration/assign-role?userId=test-user-id&roleName=User");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        
+
         // Act
         var response = await _client.SendAsync(request);
 

@@ -13,6 +13,7 @@ namespace Domain.Entities
 
         public ICollection<Project> Projects { get; private set; } = new List<Project>();
 
+
         //private User() { }
 
         public User(string firstName, string lastName, string email, string passwordHash)

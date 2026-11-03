@@ -24,19 +24,22 @@ public static class TestJwtTokenFactory
         var userManagerMock = new Mock<UserManager<User>>(
             userStoreMock.Object, null, null, null, null, null, null, null, null);
 
+
         userManagerMock
-            .Setup(x => x.GetRolesAsync(It.IsAny<User>()))
-            .ReturnsAsync(new List<string> { role });
+        .Setup(x => x.GetRolesAsync(It.IsAny<User>()))
+        .ReturnsAsync(new List<string> { role });
 
         // Arrange
         var jwtService = new JwtService(config, userManagerMock.Object);
         var password= new PasswordService().HashPassword("TestPassword123!");
 
-        var user = new UserBuilder().WithLogin("testuser")
+        var user = new UserBuilder()
+            .WithLogin("testuser")
             .WithFirstName("Test")
             .WithLastName("User")
             .WithPasswordHash(password)
             .Build();
+
 
         return await jwtService.GenerateToken(user);
     }

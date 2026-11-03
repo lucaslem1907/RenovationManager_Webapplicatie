@@ -88,6 +88,9 @@ public class WebAppFactory : WebApplicationFactory<Program>
         var mock = new Mock<UserManager<User>>(
             Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
 
+        mock.Setup(x => x.GetRolesAsync(It.IsAny<User>()))
+    .ReturnsAsync(new List<string>());
+
         mock.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
         return mock.Object;

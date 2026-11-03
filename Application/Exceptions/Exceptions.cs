@@ -106,6 +106,30 @@ namespace Application.Exceptions
         }
     }
 
+    public class RoleAlreadyAssignedError : Error
+    {
+        public RoleAlreadyAssignedError(string roleName) : base($"Role {roleName} is already assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_ALREADY_ASSIGNED";
+        }
+    }
+
+    public class RoleAssigningError : Error
+    {
+        public RoleAssigningError(string roleName) : base($"Role {roleName} is not assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_ASSIGNED";
+        }
+    }
+
+    public class RoleDeletingError : Error
+    {
+        public RoleDeletingError(string roleName) : base($"Role {roleName} cannot be deleted because it is assigned to a user")
+        {
+            Metadata["ErrorCode"] = "ROLE_CANNOT_BE_DELETED";
+        }
+    }
+
     public class BaseException : Exception
     {
         public BaseException(string message) : base(message)

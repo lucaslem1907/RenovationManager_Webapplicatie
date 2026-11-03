@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Application.Interfaces;
 using Application.Exceptions;
 using FluentResults;
+using Shared.DTO;
 namespace Application.Administration
 {
     public class AdministrationUsecase
@@ -30,6 +31,20 @@ namespace Application.Administration
                 return Result.Fail(new RoleNotFoundError(roleName));
             }
 
+            var UserRole = await _userManager.GetRolesAsync(user);
+            if (UserRole.Contains(roleName))
+            {
+                return Result.Fail(new RoleAlreadyAssignedError(roleName));
+            }
+            if (UserRole.Count > 0)
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, UserRole);
+
+                if (!removeResult.Succeeded)
+                {
+                    return Result.Fail(new RoleDeletingError(roleName));
+                }
+            }
             await _userManager.AddToRoleAsync(user, roleName);
             await _userRepository.SaveChanges();
             return Result.Ok();
@@ -51,5 +66,18 @@ namespace Application.Administration
             await _userRepository.SaveChanges();
             return Result.Ok();
         }
+
+        public async Task<Result<List<UserAdministrationDto>?>> ExecuteGetFullUserDetail(string? id, string? email, string? username, string? firstname, string? lastname)
+        {
+            var users = await _userRepository.GetUserAdministrationBySearch(id, email, username, firstname, lastname);
+            
+            if (users == null || !users.Any())
+            {
+                return Result.Fail(new OwnerNotFoundError(id));
+            }
+            return Result.Ok(users);
+        }  
+
     }
 }
+

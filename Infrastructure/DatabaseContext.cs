@@ -36,19 +36,19 @@ namespace Infrastructure
             modelBuilder.Entity<Project>(entity =>
             {
                 entity.Property(p => p.Budget)
-                      .HasColumnType("decimal(18,2)"); 
+                      .HasColumnType("decimal(18,2)");
 
                 entity.HasMany(p => p.Rooms)
                 .WithOne(r => r.Project)
                 .HasForeignKey(r => r.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-                
+
 
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.HasKey(r => r.Id);
-                
+
                 entity.Property(r => r.Name)
                     .IsRequired()
                     .HasMaxLength(200);
@@ -58,7 +58,7 @@ namespace Infrastructure
                 .HasForeignKey(t => t.RoomId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-                
+
 
             modelBuilder.Entity<TaskItem>(entity =>
             {
@@ -69,7 +69,7 @@ namespace Infrastructure
                 .HasForeignKey(s => s.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
-            
+
 
 
             modelBuilder.Entity<Expense>(entity =>
