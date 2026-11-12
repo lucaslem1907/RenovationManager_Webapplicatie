@@ -17,29 +17,30 @@ namespace Infrastructure.Repositories
 
         public async Task Add(User user)
         {
-            await _db.Set<User>().AddAsync(user);
+            //explation <set<User> or Users is a predefined table in IdentityUser 
+            await _db.Users.AddAsync(user);
         }
 
         public async Task<bool> EmailExists(string email)
         {
-            return await _db.Set<User>().AnyAsync(u => u.Email == email);
+            return await _db.Users.AnyAsync(u => u.Email == email);
         }
 
         public async Task<List<User>> GetAll()
         {
-            return await _db.Set<User>().Include(u => u.Projects).ToListAsync();
+            return await _db.Users.Include(u => u.Projects).ToListAsync();
         }
 
         public async Task<User?> GetById(string id)
         {
-            return await _db.Set<User>().FirstOrDefaultAsync(u => u.Id == id);
+            return await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> GetByLogin(string login)
         {
             var normalizedLogin = login.ToUpperInvariant();
 
-            return await _db.Set<User>()
+            return await _db.Users
                 .Include(u => u.Projects)
                 .FirstOrDefaultAsync(u =>
                     u.UserName == login ||
@@ -49,7 +50,7 @@ namespace Infrastructure.Repositories
 
         public async Task<List<UserAdministrationDto>?> GetUserAdministrationBySearch(string? id, string? email, string? username, string? firstname, string? lastname)
         {
-            var query = _db.Set<User>().AsQueryable();
+            var query = _db.Users.AsQueryable();
             if (!string.IsNullOrEmpty(id))
             {
                 query = query.Where(u => u.Id == id);
@@ -79,9 +80,9 @@ namespace Infrastructure.Repositories
                     UserName = u.UserName,
                     FirstName = u.FirstName,
                     LastName = u.LastName,
-                    Roles = _db.Set<IdentityUserRole<string>>()
+                    Roles = _db.UserRoles
                         .Where(ur => ur.UserId == u.Id)
-                        .Join(_db.Set<IdentityRole>(),
+                        .Join(_db.Roles,
                             ur => ur.RoleId,
                             r => r.Id,
                             (ur, r) => r.Name)

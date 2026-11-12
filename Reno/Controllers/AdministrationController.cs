@@ -33,6 +33,10 @@ namespace Reno.Controllers
                         return NotFound(result.Errors.First().Message);
                     case RoleNotFoundError:
                         return NotFound(result.Errors.First().Message);
+                    case RoleAlreadyAssignedError:
+                        return BadRequest(result.Errors.First().Message);
+                    case RoleDeletingError:
+                        return BadRequest(result.Errors.First().Message);
                     default:
                         return BadRequest("An error occurred");
                 }
@@ -53,6 +57,8 @@ namespace Reno.Controllers
                         return NotFound(result.Errors.First().Message);
                     case RoleNotFoundError:
                         return NotFound(result.Errors.First().Message);
+                    case RoleDeletingError:
+                        return BadRequest(result.Errors.First().Message);
                     default:
                         return BadRequest("An error occurred");
                 }

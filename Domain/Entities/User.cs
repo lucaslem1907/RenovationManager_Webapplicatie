@@ -13,14 +13,14 @@ namespace Domain.Entities
 
         public ICollection<Project> Projects { get; private set; } = new List<Project>();
 
-
-        //private User() { }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/> class.
+        /// </summary>
         public User(string firstName, string lastName, string email, string passwordHash)
         {
             Id = Guid.NewGuid().ToString();
-            LoginGenerator loginObj = new LoginGenerator(firstName, lastName);
-            Login = loginObj.Value;
+            string loginObj = GenerateLogin(firstName, lastName);
+            Login = loginObj;
             UserName = Login;
             NormalizedUserName = UserName.ToUpperInvariant();
             FirstName = firstName;
@@ -30,7 +30,10 @@ namespace Domain.Entities
             Created = DateTime.UtcNow;
             PasswordHash = passwordHash;
         }
-
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/> class with the specified login.
+        /// </summary>
         public User(string firstName, string lastName, string login, string email, string passwordHash)
         {
             Id = Guid.NewGuid().ToString();
@@ -44,26 +47,21 @@ namespace Domain.Entities
             Created = DateTime.UtcNow;
             PasswordHash = passwordHash;
         }
-    }
 
-    public class LoginGenerator
-    {
-        public string Value { get; private set; }
+        /// <summary>
+        /// Create Login string for the user based on their first and last name.
+        /// </summary>
+        /// <param name="firstname"></param>
+        /// <param name="lastName"></param>
+        /// <returns></returns>
+        private string GenerateLogin(string firstname, string lastName) { 
 
-        public LoginGenerator(string firstname, string lastName)
-        {
-            Value = CreateLogin(firstname, lastName);
-        }
-
-        private LoginGenerator() { }
-
-        public static string CreateLogin(string firstname, string lastName)
-        {
             var firstPart = firstname[0].ToString().ToLower();
             var secondPart = lastName.ToLower();
 
             return $"{firstPart}{secondPart}";
         }
+        
+        }
 
     }
-}

@@ -50,7 +50,7 @@ namespace Application.Administration
             return Result.Ok();
         }
 
-        public async Task<Result> ExecuteDeleteRole (string userId, string roleName)
+        public async Task<Result> ExecuteDeleteRole(string userId, string roleName)
         {
             var user = await _userRepository.GetById(userId);
             if (user == null)
@@ -62,7 +62,11 @@ namespace Application.Administration
             {
                 return Result.Fail(new RoleNotFoundError(roleName));
             }
-            await _userManager.RemoveFromRoleAsync(user, roleName);
+            var deleteRoleResult = await _userManager.RemoveFromRoleAsync(user, roleName);
+            if (!deleteRoleResult.Succeeded)
+            {
+                return Result.Fail(new RoleDeletingError(roleName));
+            }
             await _userRepository.SaveChanges();
             return Result.Ok();
         }
