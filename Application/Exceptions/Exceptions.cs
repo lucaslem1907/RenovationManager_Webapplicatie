@@ -130,6 +130,14 @@ namespace Application.Exceptions
         }
     }
 
+    public class RoleNotAssignedError : Error
+    {
+        public RoleNotAssignedError(string roleName) : base($"Role {roleName} is not assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_ASSIGNED";
+        }
+    }
+
     public class BaseException : Exception
     {
         public BaseException(string message) : base(message)

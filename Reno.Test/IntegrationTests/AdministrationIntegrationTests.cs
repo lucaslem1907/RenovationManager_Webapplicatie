@@ -1,4 +1,5 @@
 using Reno.Test.Factories;
+using Shared.Builders.EntityBuilders;
 using System.Net;
 using System.Net.Http.Headers;
 using Xunit;
@@ -65,6 +66,9 @@ public class AdministrationIntegrationTests : IClassFixture<WebAppFactory>
         var token = await TestJwtTokenFactory.CreateTokenAsync("Admin");
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/Administration/delete-role?userId=test-user-id&roleName=User");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        //setup 
+
         // Act
         var response = await _client.SendAsync(request);
         // Assert

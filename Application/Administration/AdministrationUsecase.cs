@@ -62,10 +62,18 @@ namespace Application.Administration
             {
                 return Result.Fail(new RoleNotFoundError(roleName));
             }
-            var deleteRoleResult = await _userManager.RemoveFromRoleAsync(user, roleName);
-            if (!deleteRoleResult.Succeeded)
+
+            if (await _userManager.IsInRoleAsync(user, roleName))
             {
-                return Result.Fail(new RoleDeletingError(roleName));
+                var removeResult = await _userManager.RemoveFromRoleAsync(user, roleName);
+                if (!removeResult.Succeeded)
+                {
+                    return Result.Fail(new RoleDeletingError(roleName));
+                }
+            }
+            else
+            {
+                return Result.Fail(new RoleNotAssignedError(roleName));
             }
             await _userRepository.SaveChanges();
             return Result.Ok();
