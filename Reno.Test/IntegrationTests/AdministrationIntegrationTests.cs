@@ -73,5 +73,18 @@ public class AdministrationIntegrationTests : IClassFixture<WebAppFactory>
         var response = await _client.SendAsync(request);
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }   
+    }
+
+    [Fact]
+    public async Task DeleteRole_WhenCallerIsAdmin_UserDoesNotHaveRole_ShouldReturnNotFound()
+    {
+        // Arrange
+        var token = await TestJwtTokenFactory.CreateTokenAsync("Admin");
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/Administration/delete-role?userId=test-user-id&roleName=Manager");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        // Act
+        var response = await _client.SendAsync(request);
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
