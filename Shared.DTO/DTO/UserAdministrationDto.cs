@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Shared.DTO
+﻿namespace Shared.DTO
 {
     public class UserAdministrationDto
     {
@@ -14,6 +8,6 @@ namespace Shared.DTO
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public List<string> Roles { get; set; } = new List<string>();
-        
+
     }
 }

@@ -1,12 +1,10 @@
 ﻿using Application.Administration;
-using Microsoft.AspNetCore.Mvc;
 using Application.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
-using Domain.Entities;
-using Shared.Dto;
 namespace Reno.Controllers
- 
+
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -33,6 +31,10 @@ namespace Reno.Controllers
                         return NotFound(result.Errors.First().Message);
                     case RoleNotFoundError:
                         return NotFound(result.Errors.First().Message);
+                    case RoleAlreadyAssignedError:
+                        return BadRequest(result.Errors.First().Message);
+                    case RoleDeletingError:
+                        return BadRequest(result.Errors.First().Message);
                     default:
                         return BadRequest("An error occurred");
                 }
@@ -53,6 +55,8 @@ namespace Reno.Controllers
                         return NotFound(result.Errors.First().Message);
                     case RoleNotFoundError:
                         return NotFound(result.Errors.First().Message);
+                    case RoleDeletingError:
+                        return BadRequest(result.Errors.First().Message);
                     default:
                         return BadRequest("An error occurred");
                 }

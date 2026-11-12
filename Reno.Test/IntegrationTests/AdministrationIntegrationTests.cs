@@ -24,7 +24,7 @@ public class AdministrationIntegrationTests : IClassFixture<WebAppFactory>
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.SendAsync(request);
+        var response = await _client.SendAsync(request, new CancellationToken());
 
         // Assert
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
