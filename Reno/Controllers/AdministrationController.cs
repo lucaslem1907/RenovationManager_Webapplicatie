@@ -57,6 +57,8 @@ namespace Reno.Controllers
                         return NotFound(result.Errors.First().Message);
                     case RoleDeletingError:
                         return BadRequest(result.Errors.First().Message);
+                    case RoleNotAssignedError:
+                        return NotFound(result.Errors.First().Message);
                     default:
                         return BadRequest("An error occurred");
                 }

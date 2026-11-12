@@ -94,7 +94,7 @@ public class WebAppFactory : WebApplicationFactory<Program>
         mock.Setup(x => x.AddToRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
 
-        mock.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
+        mock.Setup(x => x.IsInRoleAsync(It.IsAny<User>(), "User"))
             .ReturnsAsync(true);
 
         mock.Setup(x => x.RemoveFromRoleAsync(It.IsAny<User>(), It.IsAny<string>()))
