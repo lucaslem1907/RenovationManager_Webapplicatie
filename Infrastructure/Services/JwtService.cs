@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,13 +12,15 @@ namespace Infrastructure.Services
     public class JwtService
     {
         private readonly IConfiguration _config;
+        private readonly UserManager<User> _userManager;
 
-        public JwtService(IConfiguration config)
+        public JwtService(IConfiguration config, UserManager<User> userManager)
         {
             _config = config;
+            _userManager = userManager;
         }
 
-        public string GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
             var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_config["Jwt:Key"])
@@ -25,12 +28,18 @@ namespace Infrastructure.Services
             );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Name, user.Login)
             };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var token = new JwtSecurityToken(
             claims: claims,

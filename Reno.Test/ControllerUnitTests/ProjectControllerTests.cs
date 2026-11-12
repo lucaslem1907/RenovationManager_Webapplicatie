@@ -11,7 +11,7 @@ using Shared.Builders.EntityBuilders;
 using Xunit;
 using FluentResults;
 
-namespace Reno.Test.ProjectControllerTests;
+namespace Reno.Test.ControllerUnitTests;
 
 public class ProjectControllerTests
 {
@@ -48,7 +48,7 @@ public class ProjectControllerTests
 
         var controller = CreateController(projectRepoMock, userRepoMock, exportMock);
 
-        var missingOwnerId = Guid.NewGuid();
+        var missingOwnerId = Guid.NewGuid().ToString();
         var dto = new ProjectDtoBuilder().WithOwnerId(missingOwnerId).Build();
 
         userRepoMock.Setup(x => x.GetById(missingOwnerId)).ReturnsAsync((User?)null);

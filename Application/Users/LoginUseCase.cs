@@ -23,7 +23,7 @@ namespace Application.Users
             var valid = _authService.VerifyPassword(dto.password, user.PasswordHash);
             if (!valid) { return (false, null, null); }
 
-            var token = _authService.GenerateToken(user);
+            var token = await _authService.GenerateToken(user);
             return (true, token, user);
         }
     }

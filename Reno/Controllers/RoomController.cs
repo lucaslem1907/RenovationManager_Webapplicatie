@@ -12,7 +12,6 @@ using FluentResults;
 namespace Reno.Controllers
 
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RoomController : ControllerBase

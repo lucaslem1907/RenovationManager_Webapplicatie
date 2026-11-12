@@ -22,7 +22,7 @@ namespace Application.Exceptions
 
     public class OwnerNotFoundError : Error
     {
-        public OwnerNotFoundError(Guid ownerId) : base($"Owner not found for id {ownerId}")
+        public OwnerNotFoundError(string ownerId) : base($"Owner not found for id {ownerId}")
         {
             Metadata["ErrorCode"] = "OWNER_NOT_FOUND";
         }
@@ -86,17 +86,55 @@ namespace Application.Exceptions
 
     public class UserProjectsNotFoundError : Error
     {
-        public UserProjectsNotFoundError(Guid userId) : base($"No projects found for user id {userId}")
+        public UserProjectsNotFoundError(string userId) : base($"No projects found for user id {userId}")
         {
             Metadata["ErrorCode"] = "USER_PROJECTS_NOT_FOUND";
         }
     }
-
+    public class RoleNotFoundError : Error
+    {
+        public RoleNotFoundError(string roleName) : base($"Role not found for name {roleName}")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_FOUND";
+        }
+    }
     public class OwnerNotFoundException : BaseException
     {
-        public OwnerNotFoundException(Guid ownerId)
+        public OwnerNotFoundException(string ownerId)
             : base($"Owner not found for id {ownerId}")
         {
+        }
+    }
+
+    public class RoleAlreadyAssignedError : Error
+    {
+        public RoleAlreadyAssignedError(string roleName) : base($"Role {roleName} is already assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_ALREADY_ASSIGNED";
+        }
+    }
+
+    public class RoleAssigningError : Error
+    {
+        public RoleAssigningError(string roleName) : base($"Role {roleName} is not assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_ASSIGNED";
+        }
+    }
+
+    public class RoleDeletingError : Error
+    {
+        public RoleDeletingError(string roleName) : base($"Role {roleName} cannot be deleted because it is assigned to a user")
+        {
+            Metadata["ErrorCode"] = "ROLE_CANNOT_BE_DELETED";
+        }
+    }
+
+    public class RoleNotAssignedError : Error
+    {
+        public RoleNotAssignedError(string roleName) : base($"Role {roleName} is not assigned to the user")
+        {
+            Metadata["ErrorCode"] = "ROLE_NOT_ASSIGNED";
         }
     }
 

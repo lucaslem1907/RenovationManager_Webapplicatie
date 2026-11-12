@@ -9,7 +9,7 @@ public class ProjectDtoBuilder
     private string _address = "Street 1";
     private decimal _budget = 10_000;
     private DateTime _startDate = DateTime.UtcNow;
-    private Guid _ownerId = Guid.NewGuid();
+    private string _ownerId = Guid.NewGuid().ToString();
 
     public ProjectDtoBuilder WithName(string name)
     {
@@ -41,7 +41,7 @@ public class ProjectDtoBuilder
         return this;
     }
 
-    public ProjectDtoBuilder WithOwnerId(Guid ownerId)
+    public ProjectDtoBuilder WithOwnerId(string ownerId)
     {
         _ownerId = ownerId;
         return this;

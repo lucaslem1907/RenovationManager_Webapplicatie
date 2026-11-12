@@ -14,11 +14,9 @@ namespace Infrastructure.Services
             _jwtService = jwt;
             _passwordService = passwordService;
         }
-
-
-        public string GenerateToken(User user)
+        public async Task<string> GenerateToken(User user)
         {
-            return _jwtService.GenerateToken(user);
+            return await _jwtService.GenerateToken(user);
         }
 
         public string HashPassword(string password)

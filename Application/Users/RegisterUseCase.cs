@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Shared.DTO;
 
 namespace Application.Users
@@ -8,11 +9,13 @@ namespace Application.Users
     {
         private IUserRepository _repo;
         private IAuthService _authService;
+        private UserManager<User> _userManager;
 
-        public RegisterUseCase(IUserRepository repo, IAuthService authService)
+        public RegisterUseCase(IUserRepository repo, IAuthService authService, UserManager<User> userManager)
         {
             _repo = repo;
             _authService = authService;
+            _userManager = userManager;
         }
 
         public async Task<bool> Execute(UserRegisterDto dto)
@@ -27,6 +30,8 @@ namespace Application.Users
 
             await _repo.Add(user);
             await _repo.SaveChanges();
+            await _userManager.AddToRoleAsync(user, "User");
+
             return true;
 
         }

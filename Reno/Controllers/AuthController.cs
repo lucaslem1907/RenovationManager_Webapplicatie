@@ -1,11 +1,13 @@
 ﻿using Application.Users;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Reno.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly RegisterUseCase _registerUseCase;
