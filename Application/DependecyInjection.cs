@@ -16,6 +16,7 @@ namespace Application
         {
             services.AddScoped<RegisterUseCase>();
             services.AddScoped<LoginUseCase>();
+            services.AddScoped<ResetPasswordUseCase>();
             services.AddScoped<AdministrationUsecase>();
             services.AddScoped<GetUserProjectsUseCase>();
 
