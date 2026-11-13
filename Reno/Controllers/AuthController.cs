@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Application.Exceptions;
+using FluentResults;
 
 namespace Reno.Controllers
 {
@@ -12,11 +14,13 @@ namespace Reno.Controllers
     {
         private readonly RegisterUseCase _registerUseCase;
         private readonly LoginUseCase _loginUseCase;
+        private readonly ResetPasswordUseCase _resetPasswordUseCase;
 
-        public AuthController(RegisterUseCase registerUseCase, LoginUseCase loginUseCase)
+        public AuthController(RegisterUseCase registerUseCase, LoginUseCase loginUseCase, ResetPasswordUseCase resetPasswordUseCase)
         {
             _registerUseCase = registerUseCase;
             _loginUseCase = loginUseCase;
+            _resetPasswordUseCase = resetPasswordUseCase;
         }
 
         [HttpPost("register")]
@@ -45,6 +49,41 @@ namespace Reno.Controllers
 
             );
 
+        }
+
+        [HttpPost("reset-password/{Email}")]
+        public async Task<IActionResult> ResetPassword(string Email)
+        {
+            var result = await _resetPasswordUseCase.SendEmail(Email);
+            if (result.IsFailed)
+            {
+                switch(result.Errors.First())
+                {
+                    case OwnerNotFoundError:    
+                        return NotFound(result.Errors.First().Message);
+                    default:
+                        return BadRequest("Password reset failed");
+                }
+            }
+
+            return Ok(new { message = "Password reset email sent successfully" });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var result = await _resetPasswordUseCase.Execute(resetPasswordDto.Email, resetPasswordDto.NewPassword);
+            if (result.IsFailed)
+            {
+                switch (result.Errors.First())
+                {
+                    case OwnerNotFoundError:
+                        return NotFound(result.Errors.First().Message);
+                    default:
+                        return BadRequest("Password reset failed");
+                }
+            }
+            return Ok(new { message = "Password reset successfully" });
         }
     }
 }

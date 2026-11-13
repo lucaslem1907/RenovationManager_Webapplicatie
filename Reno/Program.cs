@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using System.Security.Claims;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,14 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
+//resend 
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>( o =>
+{
+    o.ApiToken = builder.Configuration["Resend:ApiKey"];
+});
+builder.Services.AddTransient<IResend, ResendClient>();
 
 var app = builder.Build();
 if (!app.Environment.IsEnvironment("Testing"))

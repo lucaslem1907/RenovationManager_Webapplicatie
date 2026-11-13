@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="FluentResults" Version="4.0.0" />
+    <PackageReference Include="Resend" Version="0.25.0" />
   </ItemGroup>
 
   <ItemGroup>

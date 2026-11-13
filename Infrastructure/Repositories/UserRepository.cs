@@ -48,6 +48,17 @@ namespace Infrastructure.Repositories
                     u.NormalizedUserName == normalizedLogin);
         }
 
+
+
+        public async Task<User?> GetByEmail(string email)
+        {
+            var normalizedEmail = email.ToUpperInvariant();
+
+            return await _db.Users.FirstOrDefaultAsync(u =>
+                u.Email == email ||
+                u.NormalizedEmail == normalizedEmail);
+        }
+
         public async Task<List<UserAdministrationDto>?> GetUserAdministrationBySearch(string? id, string? email, string? username, string? firstname, string? lastname)
         {
             var query = _db.Users.AsQueryable();
